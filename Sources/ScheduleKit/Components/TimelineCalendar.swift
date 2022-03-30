@@ -110,6 +110,7 @@ public struct TimelineLane: View {
                 NavigationView {
                     EventView($selection)
                 }
+                .navigationViewStyle(.automatic)
                 .frame(width: 400, height: 600)
                 .environmentObject(model)
             }
@@ -182,6 +183,7 @@ struct TimelineCalendar_Previews: PreviewProvider {
                     TimelineLane(model.data[calendar.id] ?? [], title: calendar.title, color: calendar.color)
                 }
                 .environmentObject(model)
+                #if os(iOS)
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
                     ToolbarItem(placement: .navigationBarTrailing) {
@@ -205,11 +207,13 @@ struct TimelineCalendar_Previews: PreviewProvider {
                                     data.append(event)
                                 }
                             }
+                            .navigationViewStyle(.automatic)
                             .frame(width: 400, height: 600, alignment: .center)
                             .environmentObject(model)
                         }
                     }
                 }
+                #endif
             }
         }
     }

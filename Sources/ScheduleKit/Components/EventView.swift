@@ -8,19 +8,17 @@
 import SwiftUI
 
 public struct EventView: View {
-
+    
     @EnvironmentObject var model: CalendarModel
-
-    @Environment(\.editMode) var editMode
-
+    
     @Binding public var event: Event?
-
-    @State var isPresented: Bool = false
-
+    
+    @State var isEditing: Bool = false
+    
     public init(_ event: Binding<Event?>) {
         self._event = event
     }
-
+    
     var dateIntervalFormatter: DateIntervalFormatter = {
         let dateIntervalFormatter = DateIntervalFormatter()
         dateIntervalFormatter.timeZone = .autoupdatingCurrent
@@ -28,19 +26,19 @@ public struct EventView: View {
         dateIntervalFormatter.timeStyle = .short
         return dateIntervalFormatter
     }()
-
+    
     public var body: some View {
         if let event = event {
-//            if editMode?.wrappedValue == .inactive {
-//                content(event)
-//            } else {
+            if isEditing {
+                content(event)
+            } else {
                 EventEditor(event) { event in
                     self.event = event
                 }
-//            }
+            }
         }
     }
-
+    
     func content(_ event: Event) -> some View {
         List {
             Section {
@@ -48,7 +46,7 @@ public struct EventView: View {
                     Text(dateIntervalFormatter.string(from: event.startDate, to: event.endDate))
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
-
+                
                 if let calendar = model.calendars.first(where: { $0.id == event.calendarID }) {
                     NavigationLink {
                         CalendarList(Binding($event)!.calendarID)
@@ -63,6 +61,7 @@ public struct EventView: View {
                 }
             }
         }
+#if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
@@ -71,12 +70,19 @@ public struct EventView: View {
                     .bold()
             }
             ToolbarItem(placement: .navigationBarTrailing) {
-                EditButton()
+                Button {
+                    withAnimation {
+                        self.isEditing.toggle()
+                    }
+                } label: {
+                    Text("編集")
+                }
             }
         }
+#endif
         .safeAreaInset(edge: .bottom) {
             Button(role: .destructive) {
-
+                
             } label: {
                 Text("イベントを削除")
                     .frame(maxWidth: .infinity)
@@ -87,7 +93,7 @@ public struct EventView: View {
 }
 
 struct EventView_Previews: PreviewProvider {
-
+    
     static let startDate: Date = DateComponents(calendar: .init(identifier: .iso8601), timeZone: .autoupdatingCurrent, year: 2022, month: 4, day: 1).date!
     static let endDate: Date = DateComponents(calendar: .init(identifier: .iso8601), timeZone: .autoupdatingCurrent, year: 2022, month: 4, day: 1, hour: 3).date!
     
@@ -101,7 +107,9 @@ struct EventView_Previews: PreviewProvider {
                                       startDate: startDate,
                                       endDate: endDate)))
         }
+#if os(iOS)
         .navigationViewStyle(.stack)
+#endif
         .environmentObject(CalendarModel(calendars: [
             .init(id: "0", title: "title0"),
             .init(id: "1", title: "title1"),

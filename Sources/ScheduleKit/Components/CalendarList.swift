@@ -8,15 +8,15 @@
 import SwiftUI
 
 public struct CalendarList: View {
-
+    
     @EnvironmentObject var model: CalendarModel
-
+    
     @Binding var selection: String
-
+    
     public init(_ calendarID: Binding<String>) {
         self._selection = calendarID
     }
-
+    
     public var body: some View {
         List {
             ForEach(model.calendars, id: \.id) { calendar in
@@ -45,7 +45,9 @@ struct CalendarList_Previews: PreviewProvider {
         NavigationView {
             CalendarList(.constant("0"))
         }
+#if os(iOS)
         .navigationViewStyle(.stack)
+#endif
         .environmentObject(CalendarModel(calendars: [
             .init(id: "0", title: "title0"),
             .init(id: "1", title: "title1"),
