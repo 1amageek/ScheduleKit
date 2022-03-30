@@ -9,7 +9,7 @@ import SwiftUI
 
 public struct EventEditor: View {
 
-    @EnvironmentObject var model: TimelineModel
+    @EnvironmentObject var model: CalendarModel
 
     @Environment(\.dismiss) var dismiss: DismissAction
 

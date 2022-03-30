@@ -9,7 +9,7 @@ import SwiftUI
 
 public struct EventView: View {
 
-    @EnvironmentObject var model: TimelineModel
+    @EnvironmentObject var model: CalendarModel
 
     @Environment(\.editMode) var editMode
 
@@ -102,7 +102,7 @@ struct EventView_Previews: PreviewProvider {
                                       endDate: endDate)))
         }
         .navigationViewStyle(.stack)
-        .environmentObject(TimelineModel(calendars: [
+        .environmentObject(CalendarModel(calendars: [
             .init(id: "0", title: "title0"),
             .init(id: "1", title: "title1"),
             .init(id: "2", title: "title2"),

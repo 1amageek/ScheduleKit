@@ -1,5 +1,5 @@
 //
-//  TimelineModel.swift
+//  CalendarModel.swift
 //  
 //
 //  Created by nori on 2022/03/30.
@@ -10,7 +10,7 @@ import TrackEditor
 import SwiftColor
 
 
-public class TimelineModel: ObservableObject {
+public class CalendarModel: ObservableObject {
 
     public var calendar: Foundation.Calendar = .init(identifier: .iso8601)
 

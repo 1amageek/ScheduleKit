@@ -9,7 +9,7 @@ import SwiftUI
 
 public struct CalendarList: View {
 
-    @EnvironmentObject var model: TimelineModel
+    @EnvironmentObject var model: CalendarModel
 
     @Binding var selection: String
 
@@ -46,7 +46,7 @@ struct CalendarList_Previews: PreviewProvider {
             CalendarList(.constant("0"))
         }
         .navigationViewStyle(.stack)
-        .environmentObject(TimelineModel(calendars: [
+        .environmentObject(CalendarModel(calendars: [
             .init(id: "0", title: "title0"),
             .init(id: "1", title: "title1"),
             .init(id: "2", title: "title2"),

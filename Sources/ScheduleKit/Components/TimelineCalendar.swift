@@ -12,7 +12,7 @@ import SwiftColor
 
 public struct TimelineCalendar<Content: View>: View {
 
-    @EnvironmentObject var model: TimelineModel
+    @EnvironmentObject var model: CalendarModel
 
     public var calendars: [Calendar]
 
@@ -66,7 +66,7 @@ public struct PlaceholderViewState {
 
 public struct TimelineLane: View {
 
-    @EnvironmentObject var model: TimelineModel
+    @EnvironmentObject var model: CalendarModel
 
     var data: Array<Event>
 
@@ -139,7 +139,7 @@ struct TimelineCalendar_Previews: PreviewProvider {
 
     struct ContentView: View {
 
-        @StateObject var model: TimelineModel = TimelineModel(calendars: [
+        @StateObject var model: CalendarModel = CalendarModel(calendars: [
             .init(id: "0", title: "title0", color: .purple),
             .init(id: "1", title: "title1", color: .red),
             .init(id: "2", title: "title2", color: .green),
