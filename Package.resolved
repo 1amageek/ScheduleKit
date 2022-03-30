@@ -1,0 +1,50 @@
+{
+  "pins" : [
+    {
+      "identity" : "calendarui",
+      "kind" : "remoteSourceControl",
+      "location" : "git@github.com:1amageek/CalendarUI.git",
+      "state" : {
+        "revision" : "ef49a8c5dfb66d1402cf0c4298505f24ffb6229d",
+        "version" : "1.0.1"
+      }
+    },
+    {
+      "identity" : "documentid",
+      "kind" : "remoteSourceControl",
+      "location" : "git@github.com:1amageek/DocumentID.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "beb1016e81032e74aeb6a95e70d678e980493198"
+      }
+    },
+    {
+      "identity" : "recurrencerule",
+      "kind" : "remoteSourceControl",
+      "location" : "git@github.com:1amageek/RecurrenceRule.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "3eafafe286fbc2f0e6e071c363a35ea5347c7e98"
+      }
+    },
+    {
+      "identity" : "swiftcolor",
+      "kind" : "remoteSourceControl",
+      "location" : "git@github.com:1amageek/SwiftColor.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "c4221b5e6602f50fd231b81fb1ad7dd2c53a7e07"
+      }
+    },
+    {
+      "identity" : "trackeditor",
+      "kind" : "remoteSourceControl",
+      "location" : "git@github.com:1amageek/TrackEditor.git",
+      "state" : {
+        "revision" : "0b0aec7853c9bcaa056f1a01b36e4e4b92cfc859",
+        "version" : "0.4.0"
+      }
+    }
+  ],
+  "version" : 2
+}
