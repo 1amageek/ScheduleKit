@@ -20,7 +20,7 @@ public struct Reminder: CalendarItem {
     @DocumentID public var id: String
     public var calendarID: Calendar.ID
     public var title: String
-    public var color: RGB
+    @ExplicitNull public var color: RGB?
     @ExplicitNull public var location: String?
     @ExplicitNull public var timeZone: TimeZone?
     @ExplicitNull public var url: URL?
@@ -41,7 +41,7 @@ public struct Reminder: CalendarItem {
         id: String,
         calendarID: Calendar.ID,
         title: String,
-        color: RGB = .blue,
+        color: RGB? = nil,
         location: String? = nil,
         timeZone: TimeZone? = nil,
         url: URL? = nil,

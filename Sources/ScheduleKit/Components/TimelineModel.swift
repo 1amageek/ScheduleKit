@@ -26,11 +26,14 @@ public class TimelineModel: ObservableObject {
         Dictionary(grouping: events, by: { $0.calendarID })
     }
 
+    public var calendarStore: CalendarStore?
+
     public var eventStore: EventStore?
 
-    public init(calendars: [Calendar] = [], events: [Event] = [], eventStore: EventStore? = nil) {
+    public init(calendars: [Calendar] = [], events: [Event] = [], calendarStore: CalendarStore? = nil, eventStore: EventStore? = nil) {
         self.calendars = calendars
         self.events = events
+        self.calendarStore = calendarStore
         self.eventStore = eventStore
     }
 
@@ -70,6 +73,14 @@ public class TimelineModel: ObservableObject {
     public func label(_ index: Int) -> String {
         let dateComponents = dateComponents(index)
         return dateComponentsFormatter.string(from: dateComponents)!
+    }
+
+    public func fetchCalendars() -> AsyncThrowingStream<([Calendar]), Error>? {
+        calendarStore?.fetchCalendars()
+    }
+
+    public func fetchEvents() -> AsyncThrowingStream<([Event]), Error>? {
+        eventStore?.fetchEvents()
     }
 
     public func fetchEvents(calendarID: Calendar.ID) -> AsyncThrowingStream<([Event]), Error>? {

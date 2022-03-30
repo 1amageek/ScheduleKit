@@ -9,5 +9,6 @@ import Foundation
 
 public protocol EventStore {
 
+    func fetchEvents() -> AsyncThrowingStream<([Event]), Error>?
     func fetchEvents(calendarID: Calendar.ID) -> AsyncThrowingStream<([Event]), Error>?
 }

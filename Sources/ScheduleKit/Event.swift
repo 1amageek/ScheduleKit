@@ -30,7 +30,7 @@ public struct Event: CalendarItem {
     @DocumentID public var id: String
     public var calendarID: Calendar.ID
     public var title: String
-    public var color: RGB
+    @ExplicitNull public var color: RGB?
     @ExplicitNull public var location: String?
     @ExplicitNull public var timeZone: TimeZone?
     @ExplicitNull public var url: URL?
@@ -53,7 +53,7 @@ public struct Event: CalendarItem {
         id: String,
         calendarID: Calendar.ID,
         title: String,
-        color: RGB = .blue,
+        color: RGB? = nil,
         location: String? = nil,
         timeZone: TimeZone? = nil,
         url: URL? = nil,
@@ -91,12 +91,3 @@ public struct Event: CalendarItem {
         self.organizer = organizer
     }
 }
-
-//extension Event {
-//
-//    public static var placeholder: Event {
-//        let calendar = Foundation.Calendar(identifier: .iso8601)
-//        var dateComponents = calendar.dateComponents([.calendar, .timeZone, .year, .month, .day, .hour, .minute], from: Date())
-//        return Event(id: AutoID.generate(length: 6), calendarID: <#T##Calendar.ID#>, title: <#T##String#>, occurrenceDate: <#T##Date#>, isAllDay: <#T##Bool#>, startDate: <#T##Date#>, endDate: <#T##Date#>)
-//    }
-//}

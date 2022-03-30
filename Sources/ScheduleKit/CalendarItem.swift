@@ -13,7 +13,7 @@ public protocol CalendarItem: Identifiable, Hashable, Codable {
     var id: String { get }
     var calendarID: String { get }
     var title: String { get }
-    var color: RGB { get }
+    var color: RGB? { get }
     var location: String? { get }
     var timeZone: TimeZone? { get }
     var url: URL? { get }
