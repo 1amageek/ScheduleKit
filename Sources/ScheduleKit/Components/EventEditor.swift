@@ -22,8 +22,6 @@ public struct EventEditor: View {
     
     var completionText: String
     
-    var onCompletion: (Event) -> Void
-    
     var dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateStyle = .short
@@ -38,13 +36,12 @@ public struct EventEditor: View {
         return formatter
     }()
     
-    public init(_ event: Event, completionText: String = "完了", onCompletion: @escaping (Event) -> Void) {
+    public init(_ event: Event, completionText: String = "完了") {
         self._event = State(initialValue: event)
         self._location = State(initialValue: event.location ?? "")
         self._urlString = State(initialValue: event.url?.absoluteString ?? "")
         self._notes = State(initialValue: event.notes ?? "")
         self.completionText = completionText
-        self.onCompletion = onCompletion
     }
     
     public var body: some View {
@@ -158,8 +155,14 @@ public struct EventEditor: View {
             }
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button {
-                    onCompletion(event)
-                    dismiss()
+                    Task {
+                        do {
+                            try await model.update(event: event)
+                            dismiss()
+                        } catch {
+                            print(error)
+                        }
+                    }
                 } label: {
                     Text(completionText)
                 }
@@ -178,9 +181,7 @@ struct EventEditor_Previews: PreviewProvider {
         @State var event: Event = Event(id: "0", calendarID: "0", title: "", occurrenceDate: startDate, isAllDay: false, startDate: startDate, endDate: endDate)
         
         var body: some View {
-            EventEditor(event) { event in
-                
-            }
+            EventEditor(event)
         }
     }
     

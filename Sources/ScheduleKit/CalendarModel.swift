@@ -22,6 +22,8 @@ public class CalendarModel: ObservableObject {
 
     @Published public var events: [Event]
 
+    public var defaultCalendar: Calendar?
+
     public var data: [String: [Event]] {
         Dictionary(grouping: events, by: { $0.calendarID })
     }
@@ -75,15 +77,29 @@ public class CalendarModel: ObservableObject {
         return dateComponentsFormatter.string(from: dateComponents)!
     }
 
-    public func fetchCalendars() -> AsyncThrowingStream<([Calendar]), Error>? {
+    public func fetchCalendars<Response>() -> AsyncThrowingStream<([Calendar], Response), Error>? {
         calendarStore?.fetchCalendars()
     }
 
-    public func fetchEvents() -> AsyncThrowingStream<([Event]), Error>? {
+    public func fetchEvents<Response>() -> AsyncThrowingStream<([Event], Response), Error>? {
         eventStore?.fetchEvents()
     }
 
-    public func fetchEvents(calendarID: Calendar.ID) -> AsyncThrowingStream<([Event]), Error>? {
+    public func fetchEvents<Response>(calendarID: Calendar.ID) -> AsyncThrowingStream<([Event], Response), Error>? {
         eventStore?.fetchEvents(calendarID: calendarID)
+    }
+
+    public func update(event: Event) async throws {
+        try await eventStore?.update(event: event)
+        if events.contains(where: { $0.calendarID == event.calendarID && $0.id == event.id }) {
+            events[event.calendarID, event.id] = event
+        } else {
+            events.append(event)
+        }
+    }
+
+    public func delete(event: Event) async throws {
+        try await eventStore?.delete(event: event)
+        events[event.calendarID, event.id] = nil
     }
 }

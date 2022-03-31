@@ -55,7 +55,7 @@ public struct Event: CalendarItem {
         title: String,
         color: RGB? = nil,
         location: String? = nil,
-        timeZone: TimeZone? = nil,
+        timeZone: TimeZone? = .autoupdatingCurrent,
         url: URL? = nil,
         notes: String? = nil,
         attendees: [Participant]? = nil,

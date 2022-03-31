@@ -55,7 +55,13 @@ public struct TimelineCalendar<Content: View>: View {
             .frame(maxWidth: .infinity)
             .tag(index)
         }
-        .environmentObject(model)
+        .task {
+//            do {
+//                self.model.calendars = try await model.fetchCalendars()
+//            } catch {
+//                print(error)
+//            }
+        }
     }
 }
 
@@ -70,7 +76,7 @@ public struct TimelineLane: View {
 
     var data: Array<Event>
 
-    var title: String
+    var calendarID: String
 
     var color: RGB
 
@@ -78,11 +84,9 @@ public struct TimelineLane: View {
 
     @State var selection: Event?
 
-    //    @State var viewState: PlaceholderViewState?
-
-    public init(_ data: Array<Event>, title: String, color: RGB) {
+    public init(_ data: Array<Event>, calendarID: String, color: RGB) {
         self.data = data
-        self.title = title
+        self.calendarID = calendarID
         self.color = color
     }
 
@@ -108,7 +112,7 @@ public struct TimelineLane: View {
             }
             .popover(item: $selection) { event in
                 NavigationView {
-                    EventView($selection)
+                    EventView(event)
                 }
                 .navigationViewStyle(.automatic)
                 .frame(width: 400, height: 600)
@@ -116,7 +120,8 @@ public struct TimelineLane: View {
             }
         } header: { _ in
             VStack(alignment: .leading) {
-                Text(title)
+                let calendar = model.calendars.first(where: { $0.id == calendarID })!
+                Text(calendar.title)
                     .font(.title2)
                     .padding(6)
                 Spacer()
@@ -172,18 +177,13 @@ struct TimelineCalendar_Previews: PreviewProvider {
 
         @State var isPresented: Bool = false
 
-        @State var data: [Event] = [
-
-        ]
-
         var body: some View {
             NavigationView {
                 Spacer()
                 TimelineCalendar(model.calendars) { calendar in
-                    TimelineLane(model.data[calendar.id] ?? [], title: calendar.title, color: calendar.color)
+                    TimelineLane(model.data[calendar.id] ?? [], calendarID: calendar.id, color: calendar.color)
                 }
                 .environmentObject(model)
-                #if os(iOS)
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
                     ToolbarItem(placement: .navigationBarTrailing) {
@@ -203,9 +203,7 @@ struct TimelineCalendar_Previews: PreviewProvider {
                                               startDate: startDate,
                                               endDate: endDate)
                             NavigationView {
-                                EventEditor(event) { event in
-                                    data.append(event)
-                                }
+                                EventEditor(event)
                             }
                             .navigationViewStyle(.automatic)
                             .frame(width: 400, height: 600, alignment: .center)
@@ -213,7 +211,6 @@ struct TimelineCalendar_Previews: PreviewProvider {
                         }
                     }
                 }
-                #endif
             }
         }
     }

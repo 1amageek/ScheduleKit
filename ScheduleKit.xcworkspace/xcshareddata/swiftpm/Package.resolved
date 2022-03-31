@@ -1,0 +1,167 @@
+{
+  "pins" : [
+    {
+      "identity" : "abseil-cpp-swiftpm",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/firebase/abseil-cpp-SwiftPM.git",
+      "state" : {
+        "revision" : "fffc3c2729be5747390ad02d5100291a0d9ad26a",
+        "version" : "0.20200225.4"
+      }
+    },
+    {
+      "identity" : "boringssl-swiftpm",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/firebase/boringssl-SwiftPM.git",
+      "state" : {
+        "revision" : "734a8247442fde37df4364c21f6a0085b6a36728",
+        "version" : "0.7.2"
+      }
+    },
+    {
+      "identity" : "calendarui",
+      "kind" : "remoteSourceControl",
+      "location" : "git@github.com:1amageek/CalendarUI.git",
+      "state" : {
+        "revision" : "ef49a8c5dfb66d1402cf0c4298505f24ffb6229d",
+        "version" : "1.0.1"
+      }
+    },
+    {
+      "identity" : "documentid",
+      "kind" : "remoteSourceControl",
+      "location" : "git@github.com:1amageek/DocumentID.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "beb1016e81032e74aeb6a95e70d678e980493198"
+      }
+    },
+    {
+      "identity" : "firebase-ios-sdk",
+      "kind" : "remoteSourceControl",
+      "location" : "git@github.com:firebase/firebase-ios-sdk.git",
+      "state" : {
+        "branch" : "master",
+        "revision" : "90b117f6f9f40ef5b627ffa3769105c01456cbce"
+      }
+    },
+    {
+      "identity" : "firestoreswift",
+      "kind" : "remoteSourceControl",
+      "location" : "git@github.com:1amageek/FirestoreSwift.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "484af9589e9d8a817ca86cadd5dd0d575aea3e7a"
+      }
+    },
+    {
+      "identity" : "googleappmeasurement",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/google/GoogleAppMeasurement.git",
+      "state" : {
+        "revision" : "9b74e6a3f875208c04c22b39b580a21d4de0f4f9",
+        "version" : "8.14.0"
+      }
+    },
+    {
+      "identity" : "googledatatransport",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/google/GoogleDataTransport.git",
+      "state" : {
+        "revision" : "15ccdfd25ac55b9239b82809531ff26605e7556e",
+        "version" : "9.1.2"
+      }
+    },
+    {
+      "identity" : "googleutilities",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/google/GoogleUtilities.git",
+      "state" : {
+        "revision" : "b3bb0c5551fb3f80ca939829639ab5b093edd14f",
+        "version" : "7.7.0"
+      }
+    },
+    {
+      "identity" : "grpc-swiftpm",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/firebase/grpc-SwiftPM.git",
+      "state" : {
+        "revision" : "fb405dd2c7901485f7e158b24e3a0a47e4efd8b5",
+        "version" : "1.28.4"
+      }
+    },
+    {
+      "identity" : "gtm-session-fetcher",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/google/gtm-session-fetcher.git",
+      "state" : {
+        "revision" : "eca9404a18f53727e4698211aaf2615eb93b962a",
+        "version" : "1.7.1"
+      }
+    },
+    {
+      "identity" : "leveldb",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/firebase/leveldb.git",
+      "state" : {
+        "revision" : "0706abcc6b0bd9cedfbb015ba840e4a780b5159b",
+        "version" : "1.22.2"
+      }
+    },
+    {
+      "identity" : "nanopb",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/firebase/nanopb.git",
+      "state" : {
+        "revision" : "7ee9ef9f627d85cbe1b8c4f49a3ed26eed216c77",
+        "version" : "2.30908.0"
+      }
+    },
+    {
+      "identity" : "promises",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/google/promises.git",
+      "state" : {
+        "revision" : "611337c330350c9c1823ad6d671e7f936af5ee13",
+        "version" : "2.0.0"
+      }
+    },
+    {
+      "identity" : "recurrencerule",
+      "kind" : "remoteSourceControl",
+      "location" : "git@github.com:1amageek/RecurrenceRule.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "3eafafe286fbc2f0e6e071c363a35ea5347c7e98"
+      }
+    },
+    {
+      "identity" : "swift-protobuf",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-protobuf.git",
+      "state" : {
+        "revision" : "e1499bc69b9040b29184f7f2996f7bab467c1639",
+        "version" : "1.19.0"
+      }
+    },
+    {
+      "identity" : "swiftcolor",
+      "kind" : "remoteSourceControl",
+      "location" : "git@github.com:1amageek/SwiftColor.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "c4221b5e6602f50fd231b81fb1ad7dd2c53a7e07"
+      }
+    },
+    {
+      "identity" : "trackeditor",
+      "kind" : "remoteSourceControl",
+      "location" : "git@github.com:1amageek/TrackEditor.git",
+      "state" : {
+        "revision" : "72ec34cf89efd24fe9ba7801e428cd5f32ed2fc4",
+        "version" : "0.4.1"
+      }
+    }
+  ],
+  "version" : 2
+}

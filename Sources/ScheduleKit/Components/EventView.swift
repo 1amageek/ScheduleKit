@@ -10,13 +10,13 @@ import SwiftUI
 public struct EventView: View {
     
     @EnvironmentObject var model: CalendarModel
-    
-    @Binding public var event: Event?
-    
+
     @State var isEditing: Bool = false
+
+    @State public var event: Event
     
-    public init(_ event: Binding<Event?>) {
-        self._event = event
+    public init(_ event: Event) {
+        self._event = State(initialValue: event)
     }
     
     var dateIntervalFormatter: DateIntervalFormatter = {
@@ -28,14 +28,10 @@ public struct EventView: View {
     }()
     
     public var body: some View {
-        if let event = event {
-            if isEditing {
-                content(event)
-            } else {
-                EventEditor(event) { event in
-                    self.event = event
-                }
-            }
+        if isEditing {
+            EventEditor(event)
+        } else {
+            content(event)
         }
     }
     
@@ -49,7 +45,7 @@ public struct EventView: View {
                 
                 if let calendar = model.calendars.first(where: { $0.id == event.calendarID }) {
                     NavigationLink {
-                        CalendarList(Binding($event)!.calendarID)
+                        CalendarList($event.calendarID)
                     } label: {
                         HStack {
                             Text("カレンダー")
@@ -82,7 +78,13 @@ public struct EventView: View {
 #endif
         .safeAreaInset(edge: .bottom) {
             Button(role: .destructive) {
-                
+                Task {
+                    do {
+                        try await model.delete(event: event)
+                    } catch {
+                        print(error)
+                    }
+                }
             } label: {
                 Text("イベントを削除")
                     .frame(maxWidth: .infinity)
@@ -99,13 +101,13 @@ struct EventView_Previews: PreviewProvider {
     
     static var previews: some View {
         NavigationView {
-            EventView(.constant(Event(id: "0",
+            EventView(Event(id: "0",
                                       calendarID: "0",
                                       title: "TITLE",
                                       occurrenceDate: startDate,
                                       isAllDay: false,
                                       startDate: startDate,
-                                      endDate: endDate)))
+                                      endDate: endDate))
         }
 #if os(iOS)
         .navigationViewStyle(.stack)
