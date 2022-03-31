@@ -16,12 +16,25 @@ struct Sidebar: View {
 
     @EnvironmentObject var model: CalendarModel
 
+    @State var selection: ScheduleKit.Calendar?
+
     var body: some View {
         List {
             ForEach(model.calendars, id: \.id) { calendar in
-                Text(calendar.title)
+                HStack {
+                    Text(calendar.title)
+                    Spacer()
+                    Button {
+                        selection = calendar
+                    } label: {
+                        Image(systemName: "info.circle")
+                    }
+                }
             }
         }
+        .popover(item: $selection, content: { calendar in
+            Text("W")
+        })
         .toolbar {
             Button {
                 let calendar: ScheduleKit.Calendar = ScheduleKit.Calendar(id: AutoID.generate(length: 4), title: "Title")

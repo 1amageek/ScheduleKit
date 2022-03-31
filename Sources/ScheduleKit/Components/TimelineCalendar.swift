@@ -14,9 +14,11 @@ public struct TimelineCalendar<Content: View>: View {
 
     @EnvironmentObject var model: CalendarModel
 
+    @State var selection: Event?
+
     public var calendars: [Calendar]
 
-    public var content: (Calendar) -> Content
+    public var content: (Calendar, Binding<Event?>) -> Content
 
     var range: Range<Int> {
         switch model.options.interval {
@@ -32,28 +34,49 @@ public struct TimelineCalendar<Content: View>: View {
         }
     }
 
-    public init(_ calendars: [Calendar], @ViewBuilder content: @escaping (Calendar) -> Content) {
+    public init(_ calendars: [Calendar], @ViewBuilder content: @escaping (Calendar, Binding<Event?>) -> Content) {
         self.calendars = calendars
         self.content = content
     }
 
+    func anchor(geometory: GeometryProxy, preferences: [RegionPreference]) -> CGRect {
+        if let bounds = preferences.first(where: { $0.event == selection  })?.bounds {
+            return geometory[bounds]
+        }
+        return .zero
+    }
+
     public var body: some View {
-        TrackEditor(range, options: model.options) {
-            ForEach(calendars, id: \.id) { calendar in
-                content(calendar)
+        GeometryReader { proxy in
+            TrackEditor(range, options: model.options) {
+                ForEach(calendars, id: \.id) { calendar in
+                    content(calendar, $selection)
+                }
+            } header: {
+                Color.white
+                    .frame(height: 44)
+            } ruler: { index in
+                HStack {
+                    Text(model.label(index))
+                        .padding(.horizontal, 12)
+                    Spacer()
+                    Divider()
+                }
+                .frame(maxWidth: .infinity)
+                .tag(index)
             }
-        } header: {
-            Color.white
-                .frame(height: 44)
-        } ruler: { index in
-            HStack {
-                Text(model.label(index))
-                    .padding(.horizontal, 12)
-                Spacer()
-                Divider()
+            .overlayPreferenceValue(RegionPreferenceKey.self) { value in
+                let anchor = anchor(geometory: proxy, preferences: value)
+                Color.clear
+                    .popover(item: $selection, attachmentAnchor: .rect(.rect(anchor))) { event in
+                        NavigationView {
+                            EventView(event)
+                        }
+                        .navigationViewStyle(.automatic)
+                        .frame(width: 400, height: 600)
+                        .environmentObject(model)
+                    }
             }
-            .frame(maxWidth: .infinity)
-            .tag(index)
         }
     }
 }
@@ -67,6 +90,8 @@ public struct TimelineLane: View {
 
     @EnvironmentObject var model: CalendarModel
 
+    @Binding var selection: Event?
+
     var data: Array<Event>
 
     var calendarID: String
@@ -75,41 +100,37 @@ public struct TimelineLane: View {
 
     @State var draft: Event?
 
-    @State var selection: Event?
+    @State var regionRreferences: [RegionPreference] = []
 
-    public init(_ data: Array<Event>, calendarID: String, color: RGB) {
+    public init(_ data: Array<Event>, selection: Binding<Event?>, calendarID: String, color: RGB) {
         self.data = data
+        self._selection = selection
         self.calendarID = calendarID
         self.color = color
     }
 
     public var body: some View {
         TrackLane(data) { event in
-            VStack(alignment: .leading, spacing: 4) {
-                Text(event.title)
-                    .font(.title3)
-                    .bold()
-                    .foregroundColor(color.color)
-                    .brightness(-0.4)
-                Text(model.dateFormatter.string(from: event.startDate))
-                    .foregroundColor(color.color)
-                    .brightness(-0.2)
-            }
-            .padding(EdgeInsets(top: 6, leading: 8, bottom: 6, trailing: 8))
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-            .background(color.color.saturation(0.35).brightness(0.35))
-            .cornerRadius(8)
-            .padding(EdgeInsets(top: 2, leading: 2, bottom: 2, trailing: 2))
-            .onTapGesture {
-                self.selection = event
-            }
-            .popover(item: $selection) { event in
-                NavigationView {
-                    EventView(event)
+            GeometryReader { proxy in
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(event.title)
+                        .font(.title3)
+                        .bold()
+                        .foregroundColor(color.color)
+                        .brightness(-0.4)
+                    Text(model.dateFormatter.string(from: event.startDate))
+                        .foregroundColor(color.color)
+                        .brightness(-0.2)
                 }
-                .navigationViewStyle(.automatic)
-                .frame(width: 400, height: 600)
-                .environmentObject(model)
+                .padding(EdgeInsets(top: 6, leading: 8, bottom: 6, trailing: 8))
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                .background(color.color.saturation(0.35).brightness(0.35))
+                .cornerRadius(8)
+                .padding(EdgeInsets(top: 2, leading: 2, bottom: 2, trailing: 2))
+                .onTapGesture {
+                    self.selection = event
+                }
+                .anchorPreference(key: RegionPreferenceKey.self, value: .bounds, transform: { [RegionPreference(event: event, bounds: $0)] })
             }
         } header: { _ in
             VStack(alignment: .leading) {
@@ -129,6 +150,24 @@ public struct TimelineLane: View {
                 Divider()
             }
         }
+    }
+}
+
+struct RegionPreference: Hashable {
+    var event: Event
+    var bounds: Anchor<CGRect>
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(event.id)
+        hasher.combine(event.calendarID)
+    }
+}
+
+struct RegionPreferenceKey: PreferenceKey {
+
+    static var defaultValue: [RegionPreference] = []
+
+    static func reduce(value: inout [RegionPreference], nextValue: () -> [RegionPreference]) {
+        value += nextValue()
     }
 }
 
@@ -174,8 +213,8 @@ struct TimelineCalendar_Previews: PreviewProvider {
         var body: some View {
             NavigationView {
                 Spacer()
-                TimelineCalendar(model.calendars) { calendar in
-                    TimelineLane(model.data[calendar.id] ?? [], calendarID: calendar.id, color: calendar.color)
+                TimelineCalendar(model.calendars) { calendar, selection in
+                    TimelineLane(model.data[calendar.id] ?? [], selection: selection, calendarID: calendar.id, color: calendar.color)
                 }
                 .environmentObject(model)
                 .navigationBarTitleDisplayMode(.inline)

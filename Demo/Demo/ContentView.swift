@@ -18,8 +18,8 @@ struct ContentView: View {
     var body: some View {
         NavigationView {
             Sidebar()
-            TimelineCalendar(model.calendars) { calendar in
-                TimelineLane(model.data[calendar.id] ?? [], calendarID: calendar.id, color: calendar.color)
+            TimelineCalendar(model.calendars) { calendar, selection in
+                TimelineLane(model.data[calendar.id] ?? [], selection: selection, calendarID: calendar.id, color: calendar.color)
                     .task {
                         do {
                             for try await ((added, modified, removed), _): ((added: [Event], modified: [Event], removed: [Event]), QuerySnapshot) in model.fetchEvents(calendarID: calendar.id)! {
