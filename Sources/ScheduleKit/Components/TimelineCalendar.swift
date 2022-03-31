@@ -55,13 +55,6 @@ public struct TimelineCalendar<Content: View>: View {
             .frame(maxWidth: .infinity)
             .tag(index)
         }
-        .task {
-//            do {
-//                self.model.calendars = try await model.fetchCalendars()
-//            } catch {
-//                print(error)
-//            }
-        }
     }
 }
 
@@ -120,10 +113,11 @@ public struct TimelineLane: View {
             }
         } header: { _ in
             VStack(alignment: .leading) {
-                let calendar = model.calendars.first(where: { $0.id == calendarID })!
-                Text(calendar.title)
-                    .font(.title2)
-                    .padding(6)
+                if let calendar = model.calendars.first(where: { $0.id == calendarID }) {
+                    Text(calendar.title)
+                        .font(.title2)
+                        .padding(6)
+                }
                 Spacer()
                 Divider()
             }

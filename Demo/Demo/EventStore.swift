@@ -9,20 +9,32 @@ import Foundation
 import FirebaseFirestore
 import FirestoreSwift
 import ScheduleKit
+import DocumentID
 
 final class EventStore: ObservableObject, ScheduleKit.EventStore {
 
 
-    func fetchEvents<Response>() -> AsyncThrowingStream<((added: [Event], modified: [Event], removed: [Event]), Response), Error>? {
+    func fetchEvents<Response>() -> AsyncThrowingStream<([Event], Response), Error>? {
         return nil
     }
 
     func fetchEvents<FIRQuerySnapshot>(calendarID: ScheduleKit.Calendar.ID) -> AsyncThrowingStream<((added: [Event], modified: [Event], removed: [Event]), FIRQuerySnapshot), Error>? {
         return Firestore.firestore().collection("calendars").document(calendarID).collection("events").changes(type: Event.self) as! AsyncThrowingStream<((added: [Event], modified: [Event], removed: [Event]), FIRQuerySnapshot), Error>?
     }
-//    func fetchEvents<FIRQuerySnapshot>(calendarID: ScheduleKit.Calendar.ID) -> AsyncThrowingStream<([Event], FIRQuerySnapshot), Error>? {
-//        return Firestore.firestore().collection("calendars").document(calendarID).collection("events").updates(type: Event.self) as! AsyncThrowingStream<([Event], FIRQuerySnapshot), Error>?
-//    }
+
+    func placeholder(calendarID: String) -> Event? {
+        let id = AutoID.generate(length: 4)
+        let startDate: Date = DateComponents(calendar: .init(identifier: .iso8601), timeZone: .autoupdatingCurrent, year: 2022, month: 4, day: 1, hour: 4).date!
+        let endDate: Date = DateComponents(calendar: .init(identifier: .iso8601), timeZone: .autoupdatingCurrent, year: 2022, month: 4, day: 1, hour: 7).date!
+        let event = Event(id: id,
+                          calendarID: calendarID,
+                          title: "TITLE",
+                          occurrenceDate: startDate,
+                          isAllDay: false,
+                          startDate: startDate,
+                          endDate: endDate)
+        return event
+    }
 
     func update(event: Event) async throws {
         try Firestore.firestore().collection("calendars").document(event.calendarID).collection("events").document(event.id).setData(from: event, merge: true)

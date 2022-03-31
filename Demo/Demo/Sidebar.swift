@@ -16,7 +16,6 @@ struct Sidebar: View {
 
     @EnvironmentObject var model: CalendarModel
 
-
     var body: some View {
         List {
             ForEach(model.calendars, id: \.id) { calendar in
@@ -26,8 +25,13 @@ struct Sidebar: View {
         .toolbar {
             Button {
                 let calendar: ScheduleKit.Calendar = ScheduleKit.Calendar(id: AutoID.generate(length: 4), title: "Title")
-                model.calendars.append(calendar)
-                _ = try? Firestore.firestore().collection("calendars").addDocument(from: calendar)
+                Task {
+                    do {
+                        try await self.model.update(calendar: calendar)
+                    } catch {
+                        print(error)
+                    }
+                }
             } label: {
                 Image(systemName: "plus")
             }

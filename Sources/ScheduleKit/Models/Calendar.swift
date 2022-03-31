@@ -64,3 +64,20 @@ public struct Calendar: Identifiable, Codable, Hashable {
         self.supportedEventAvailabilities = supportedEventAvailabilities
     }
 }
+
+extension Array where Element == Calendar {
+
+    public subscript(id: String) -> Calendar? {
+        get {
+            self.first(where: { $0.id == id })
+        }
+        set {
+            if let newValue = newValue,
+               let index = self.firstIndex(where:{ $0.id == id }) {
+                self[index] = newValue
+            } else if let index = self.firstIndex(where:{ $0.id == id }) {
+                self.remove(at: index)
+            }
+        }
+    }
+}

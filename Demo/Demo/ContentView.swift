@@ -13,7 +13,7 @@ struct ContentView: View {
 
     @StateObject var model: CalendarModel = CalendarModel(calendarStore: CalendarStore(), eventStore: EventStore())
 
-    @State var isPresented: Bool = false
+    @State var event: Event?
 
     var body: some View {
         NavigationView {
@@ -22,9 +22,24 @@ struct ContentView: View {
                 TimelineLane(model.data[calendar.id] ?? [], calendarID: calendar.id, color: calendar.color)
                     .task {
                         do {
-                            for try await (events, _): ([Event], QuerySnapshot) in model.fetchEvents(calendarID: calendar.id)! {
-                                self.model.events += events.filter { event in
-                                    !self.model.events.contains(where: { $0.id == event.id && $0.calendarID == event.calendarID })
+                            for try await ((added, modified, removed), _): ((added: [Event], modified: [Event], removed: [Event]), QuerySnapshot) in model.fetchEvents(calendarID: calendar.id)! {
+                                print(added, modified, removed)
+                                let current = self.model.events
+                                if !added.isEmpty {
+                                    let events = added.filter { event in
+                                        !current.contains(where: { $0.id == event.id && $0.calendarID == event.calendarID })
+                                    }
+                                    self.model.events += events
+                                }
+                                if !modified.isEmpty {
+                                    modified.forEach { event in
+                                        self.model.events[event.calendarID, event.id] = event
+                                    }
+                                }
+                                if !removed.isEmpty {
+                                    self.model.events = removed.filter { event in
+                                        current.contains(where: { $0.id == event.id && $0.calendarID == event.calendarID })
+                                    }
                                 }
                             }
                         } catch {
@@ -40,27 +55,18 @@ struct ContentView: View {
                             return
                         }
                         self.model.defaultCalendar = calendar
-                        isPresented.toggle()
+                        self.event = self.model.eventStore?.placeholder(calendarID: calendar.id)
                     } label: {
                         Image(systemName: "plus")
                     }
-                    .popover(isPresented: $isPresented) {                        
-                        let startDate: Date = DateComponents(calendar: .init(identifier: .iso8601), timeZone: .autoupdatingCurrent, year: 2022, month: 4, day: 1, hour: 4).date!
-                        let endDate: Date = DateComponents(calendar: .init(identifier: .iso8601), timeZone: .autoupdatingCurrent, year: 2022, month: 4, day: 1, hour: 7).date!
-                        let event = Event(id: "1",
-                                          calendarID: self.model.defaultCalendar!.id ,
-                                          title: "TITLE",
-                                          occurrenceDate: startDate,
-                                          isAllDay: false,
-                                          startDate: startDate,
-                                          endDate: endDate)
+                    .popover(item: $event, content: { event in
                         NavigationView {
                             EventEditor(event)
                         }
                         .navigationViewStyle(.automatic)
                         .frame(width: 400, height: 600, alignment: .center)
                         .environmentObject(model)
-                    }
+                    })
                 }
             }
             .task {

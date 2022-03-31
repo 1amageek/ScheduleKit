@@ -20,13 +20,15 @@ public class CalendarModel: ObservableObject {
 
     @Published public var calendars: [Calendar]
 
-    @Published public var events: [Event]
+    @Published public var events: [Event] {
+        didSet {
+            self.data = Dictionary(grouping: events, by: { $0.calendarID })
+        }
+    }
 
     public var defaultCalendar: Calendar?
 
-    public var data: [String: [Event]] {
-        Dictionary(grouping: events, by: { $0.calendarID })
-    }
+    public var data: [String: [Event]] = [:]
 
     public var calendarStore: CalendarStore?
 
@@ -77,22 +79,50 @@ public class CalendarModel: ObservableObject {
         return dateComponentsFormatter.string(from: dateComponents)!
     }
 
+    // Calendar: -
+
     public func fetchCalendars<Response>() -> AsyncThrowingStream<([Calendar], Response), Error>? {
         calendarStore?.fetchCalendars()
     }
+
+    public func update(calendar: Calendar) async throws {
+        try await calendarStore?.update(calendar: calendar)
+        if calendars.contains(where: { $0.id == calendar.id }) {
+            Task.detached {
+                self.calendars[calendar.id] = calendar
+            }
+        } else {
+            calendars.append(calendar)
+        }
+    }
+
+    public func delete(calendar: Calendar) async throws {
+        try await calendarStore?.delete(calendar: calendar)
+        Task.detached {
+            self.calendars[calendar.id] = nil
+        }
+    }
+
+    // Event: -
 
     public func fetchEvents<Response>() -> AsyncThrowingStream<([Event], Response), Error>? {
         eventStore?.fetchEvents()
     }
 
-    public func fetchEvents<Response>(calendarID: Calendar.ID) -> AsyncThrowingStream<([Event], Response), Error>? {
+    public func fetchEvents<Response>(calendarID: Calendar.ID) -> AsyncThrowingStream<((added: [Event], modified: [Event], removed: [Event]), Response), Error>? {
         eventStore?.fetchEvents(calendarID: calendarID)
+    }
+
+    func placeholder(calendarID: String) -> Event? {
+        eventStore?.placeholder(calendarID: calendarID)
     }
 
     public func update(event: Event) async throws {
         try await eventStore?.update(event: event)
         if events.contains(where: { $0.calendarID == event.calendarID && $0.id == event.id }) {
-            events[event.calendarID, event.id] = event
+            Task.detached {
+                self.events[event.calendarID, event.id] = event
+            }
         } else {
             events.append(event)
         }
@@ -100,6 +130,8 @@ public class CalendarModel: ObservableObject {
 
     public func delete(event: Event) async throws {
         try await eventStore?.delete(event: event)
-        events[event.calendarID, event.id] = nil
+        Task.detached {
+            self.events[event.calendarID, event.id] = nil
+        }
     }
 }

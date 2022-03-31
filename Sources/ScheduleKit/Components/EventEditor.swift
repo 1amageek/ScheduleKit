@@ -74,6 +74,11 @@ public struct EventEditor: View {
                             EmptyView()
                         }
                         .fixedSize()
+                        .onChange(of: event.startDate) { newValue in
+                            if event.endDate < newValue {
+                                event.endDate = self.model.calendar.date(byAdding: .hour, value: 1, to: newValue)!
+                            }
+                        }
                     }
                 }
                 if startDate {
@@ -102,6 +107,11 @@ public struct EventEditor: View {
                             EmptyView()
                         }
                         .fixedSize()
+                        .onChange(of: event.endDate) { newValue in
+                            if newValue < event.startDate {
+                                event.startDate = self.model.calendar.date(byAdding: .hour, value: -1, to: newValue)!
+                            }
+                        }
                     }
                 }
                 if endDate {
