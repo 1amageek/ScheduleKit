@@ -49,7 +49,7 @@ public enum ParticipantScheduleStatus: String, Codable, @unchecked Sendable {
 
 public struct Participant: Codable, Hashable {
 
-    @ExplicitNull public var name: String?
+    public var name: String
     @ExplicitNull public var thumbnailURL: URL?
     public var role: ParticipantRole
     public var status: ParticipantStatus
@@ -57,7 +57,7 @@ public struct Participant: Codable, Hashable {
     public var url: URL
 
     public init(
-        name: String?,
+        name: String,
         thumbnailURL: URL? = nil,
         role: ParticipantRole = .unknown,
         status: ParticipantStatus = .unknown,

@@ -42,6 +42,14 @@ public struct EventView: View {
                     Text(dateIntervalFormatter.string(from: event.startDate, to: event.endDate))
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
+
+                if let staffs = self.event.attendees?.filter({ $0.type == .person }) {
+                    HStack {
+                        ForEach(staffs, id: \.self) { staff in
+                            PersonThumbnail(name: staff.name, thumbnailURL: staff.thumbnailURL)
+                        }
+                    }
+                }
                 
                 if let calendar = model.calendars.first(where: { $0.id == event.calendarID }) {
                     NavigationLink {

@@ -47,35 +47,72 @@ public struct TimelineCalendar<Content: View>: View {
     }
 
     public var body: some View {
-        GeometryReader { proxy in
-            TrackEditor(range, options: model.options) {
-                ForEach(calendars, id: \.id) { calendar in
-                    content(calendar, $selection)
+        VStack(alignment: .leading, spacing: 0) {
+            HStack {
+                Button { model.prev() } label: {
+                    Image(systemName: "chevron.backward")
+                        .font(.system(size: 20, weight: .semibold))
                 }
-            } header: {
-                Color.white
-                    .frame(height: 44)
-            } ruler: { index in
-                HStack {
-                    Text(model.label(index))
-                        .padding(.horizontal, 12)
-                    Spacer()
-                    Divider()
+                .buttonStyle(.bordered)
+                .controlSize(.large)
+                Text(model.navigationTitle)
+                    .font(.title)
+                    .fontWeight(.black)
+
+                Spacer()
+                Button { model.next() } label: {
+                    Image(systemName: "chevron.forward")
+                        .font(.system(size: 20, weight: .semibold))
                 }
-                .frame(maxWidth: .infinity)
-                .tag(index)
+                .buttonStyle(.bordered)
+                .controlSize(.large)
             }
-            .overlayPreferenceValue(RegionPreferenceKey.self) { value in
-                let anchor = anchor(geometory: proxy, preferences: value)
-                Color.clear
-                    .popover(item: $selection, attachmentAnchor: .rect(.rect(anchor))) { event in
-                        NavigationView {
-                            EventView(event)
-                        }
-                        .navigationViewStyle(.automatic)
-                        .frame(width: 400, height: 600)
-                        .environmentObject(model)
+            .padding()
+            .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+            .background(.bar)
+            Divider()
+            GeometryReader { proxy in
+                TrackEditor(range, options: model.options) {
+                    ForEach(calendars, id: \.id) { calendar in
+                        content(calendar, $selection)
                     }
+                } header: {
+                    Color.white
+                        .frame(height: 44)
+                } ruler: { index in
+                    HStack {
+                        Text(model.label(index))
+                            .padding(.horizontal, 12)
+                        Spacer()
+                        Divider()
+                    }
+                    .frame(maxWidth: .infinity)
+                    .tag(index)
+                }
+                .overlayPreferenceValue(RegionPreferenceKey.self) { value in
+                    let anchor = anchor(geometory: proxy, preferences: value)
+                    Color.clear
+                        .popover(item: $selection, attachmentAnchor: .rect(.rect(anchor))) { event in
+                            NavigationView {
+                                EventView(event)
+                            }
+                            .navigationViewStyle(.automatic)
+                            .frame(width: 400, height: 600)
+                            .environmentObject(model)
+                        }
+                }
+            }
+        }
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                Picker(selection: $model.displayMode) {
+                    Text("月").tag(CalendarDisplayMode.month(year: model.displayMode.year, month: model.displayMode.month))
+                    Text("日").tag(CalendarDisplayMode.day(year: model.displayMode.year, month: model.displayMode.month, day: model.displayMode.day))
+                } label: {
+                    EmptyView()
+                }
+                .pickerStyle(.segmented)
+                .frame(width: 200, height: 44)
             }
         }
     }
@@ -118,11 +155,6 @@ public struct Region: View {
                 self.selection = event
             }
             .anchorPreference(key: RegionPreferenceKey.self, value: .bounds, transform: { [RegionPreference(event: event, bounds: $0)] })
-        }
-        .toolbar {
-            ToolbarItem(placement: .navigation) {
-//                Text(model.)
-            }
         }
     }
 }
