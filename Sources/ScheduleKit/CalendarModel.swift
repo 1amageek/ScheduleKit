@@ -88,7 +88,7 @@ public class CalendarModel: ObservableObject {
     public func update(calendar: Calendar) async throws {
         try await calendarStore?.update(calendar: calendar)
         if calendars.contains(where: { $0.id == calendar.id }) {
-            Task.detached {
+            Task.detached { @MainActor in
                 self.calendars[calendar.id] = calendar
             }
         } else {
@@ -98,7 +98,7 @@ public class CalendarModel: ObservableObject {
 
     public func delete(calendar: Calendar) async throws {
         try await calendarStore?.delete(calendar: calendar)
-        Task.detached {
+        Task.detached { @MainActor in
             self.calendars[calendar.id] = nil
         }
     }

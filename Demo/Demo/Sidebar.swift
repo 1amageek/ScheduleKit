@@ -33,7 +33,11 @@ struct Sidebar: View {
             }
         }
         .popover(item: $selection, content: { calendar in
-            Text("W")
+            NavigationView {
+                CalendarEditor(calendar)
+            }
+                .frame(width: 400, height: 600)
+                .environmentObject(model)
         })
         .toolbar {
             Button {
