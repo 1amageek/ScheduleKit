@@ -33,6 +33,22 @@ public struct CalendarEditor: View {
             } label: {
                 Text("カラー")
             }
+
+            Button {
+                Task {
+                    do {
+                        try await self.model.create(person: Person(calendarID: calendar.id, name: "NAME", url: URL(string: "https://google.com")!))
+                        Task.detached { @MainActor in
+                            dismiss()
+                        }
+                    } catch {
+                        print(error)
+                    }
+                }
+            } label: {
+                Text("スタッフを追加")
+            }
+
         }
         .navigationTitle("カレンダーを編集")
         .toolbar {

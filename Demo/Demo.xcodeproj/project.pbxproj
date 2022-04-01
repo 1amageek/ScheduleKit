@@ -7,20 +7,22 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		12315CC727F6F01A003FBC4F /* PersonStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12315CC627F6F01A003FBC4F /* PersonStore.swift */; };
 		1231A62D27F4B88000FD3220 /* DemoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1231A62C27F4B88000FD3220 /* DemoApp.swift */; };
 		1231A62F27F4B88000FD3220 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1231A62E27F4B88000FD3220 /* ContentView.swift */; };
 		1231A63127F4B88200FD3220 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1231A63027F4B88200FD3220 /* Assets.xcassets */; };
 		1231A63427F4B88200FD3220 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1231A63327F4B88200FD3220 /* Preview Assets.xcassets */; };
 		1231A63C27F4B9D300FD3220 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 1231A63B27F4B9D300FD3220 /* FirebaseFirestore */; };
-		1231A63F27F4BA4E00FD3220 /* FirestoreSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 1231A63E27F4BA4E00FD3220 /* FirestoreSwift */; };
 		1231A64327F4BBD100FD3220 /* ScheduleKit in Frameworks */ = {isa = PBXBuildFile; productRef = 1231A64227F4BBD100FD3220 /* ScheduleKit */; };
 		1231A64427F4BE2B00FD3220 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 1231A64027F4BA9B00FD3220 /* GoogleService-Info.plist */; };
 		1231A64627F5676300FD3220 /* Sidebar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1231A64527F5676300FD3220 /* Sidebar.swift */; };
 		1231A64827F56CE200FD3220 /* CalendarStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1231A64727F56CE200FD3220 /* CalendarStore.swift */; };
 		1231A64A27F57DB000FD3220 /* EventStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1231A64927F57DB000FD3220 /* EventStore.swift */; };
+		1282CF4D27F6FE44008CDD90 /* FirestoreSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 1282CF4C27F6FE44008CDD90 /* FirestoreSwift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		12315CC627F6F01A003FBC4F /* PersonStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonStore.swift; sourceTree = "<group>"; };
 		1231A62927F4B88000FD3220 /* Demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Demo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1231A62C27F4B88000FD3220 /* DemoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoApp.swift; sourceTree = "<group>"; };
 		1231A62E27F4B88000FD3220 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -37,9 +39,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1231A63F27F4BA4E00FD3220 /* FirestoreSwift in Frameworks */,
 				1231A64327F4BBD100FD3220 /* ScheduleKit in Frameworks */,
 				1231A63C27F4B9D300FD3220 /* FirebaseFirestore in Frameworks */,
+				1282CF4D27F6FE44008CDD90 /* FirestoreSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -72,6 +74,7 @@
 				1231A64527F5676300FD3220 /* Sidebar.swift */,
 				1231A64727F56CE200FD3220 /* CalendarStore.swift */,
 				1231A64927F57DB000FD3220 /* EventStore.swift */,
+				12315CC627F6F01A003FBC4F /* PersonStore.swift */,
 				1231A63027F4B88200FD3220 /* Assets.xcassets */,
 				1231A63227F4B88200FD3220 /* Preview Content */,
 			);
@@ -111,8 +114,8 @@
 			name = Demo;
 			packageProductDependencies = (
 				1231A63B27F4B9D300FD3220 /* FirebaseFirestore */,
-				1231A63E27F4BA4E00FD3220 /* FirestoreSwift */,
 				1231A64227F4BBD100FD3220 /* ScheduleKit */,
+				1282CF4C27F6FE44008CDD90 /* FirestoreSwift */,
 			);
 			productName = Demo;
 			productReference = 1231A62927F4B88000FD3220 /* Demo.app */;
@@ -144,7 +147,7 @@
 			mainGroup = 1231A62027F4B88000FD3220;
 			packageReferences = (
 				1231A63A27F4B9D300FD3220 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
-				1231A63D27F4BA4E00FD3220 /* XCRemoteSwiftPackageReference "FirestoreSwift" */,
+				1282CF4B27F6FE44008CDD90 /* XCRemoteSwiftPackageReference "FirestoreSwift" */,
 			);
 			productRefGroup = 1231A62A27F4B88000FD3220 /* Products */;
 			projectDirPath = "";
@@ -173,6 +176,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				12315CC727F6F01A003FBC4F /* PersonStore.swift in Sources */,
 				1231A64A27F57DB000FD3220 /* EventStore.swift in Sources */,
 				1231A62F27F4B88000FD3220 /* ContentView.swift in Sources */,
 				1231A64827F56CE200FD3220 /* CalendarStore.swift in Sources */,
@@ -386,7 +390,7 @@
 				kind = branch;
 			};
 		};
-		1231A63D27F4BA4E00FD3220 /* XCRemoteSwiftPackageReference "FirestoreSwift" */ = {
+		1282CF4B27F6FE44008CDD90 /* XCRemoteSwiftPackageReference "FirestoreSwift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "git@github.com:1amageek/FirestoreSwift.git";
 			requirement = {
@@ -402,14 +406,14 @@
 			package = 1231A63A27F4B9D300FD3220 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseFirestore;
 		};
-		1231A63E27F4BA4E00FD3220 /* FirestoreSwift */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 1231A63D27F4BA4E00FD3220 /* XCRemoteSwiftPackageReference "FirestoreSwift" */;
-			productName = FirestoreSwift;
-		};
 		1231A64227F4BBD100FD3220 /* ScheduleKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = ScheduleKit;
+		};
+		1282CF4C27F6FE44008CDD90 /* FirestoreSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1282CF4B27F6FE44008CDD90 /* XCRemoteSwiftPackageReference "FirestoreSwift" */;
+			productName = FirestoreSwift;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

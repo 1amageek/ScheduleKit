@@ -12,8 +12,8 @@ import ScheduleKit
 
 final class CalendarStore: ObservableObject, ScheduleKit.CalendarStore {
 
-    func fetchCalendars<FIRQuerySnapshot>() -> AsyncThrowingStream<([ScheduleKit.Calendar], FIRQuerySnapshot), Error>? {
-        Firestore.firestore().collection("calendars").updates(type: ScheduleKit.Calendar.self) as! AsyncThrowingStream<([ScheduleKit.Calendar], FIRQuerySnapshot), Error>?
+    func fetchCalendars() -> AsyncThrowingStream<[ScheduleKit.Calendar], Error>? {
+        Firestore.firestore().collection("calendars").updates(type: ScheduleKit.Calendar.self)
     }
 
     func update(calendar: ScheduleKit.Calendar) async throws {

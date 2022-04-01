@@ -12,13 +12,15 @@ public struct EventEditor: View {
     @EnvironmentObject var model: CalendarModel
     
     @Environment(\.dismiss) var dismiss: DismissAction
-    
+
+    var primitive: Event
     @State var event: Event
     @State var startDate: Bool = false
     @State var endDate: Bool = false
     @State var location: String = ""
     @State var urlString: String = ""
     @State var notes: String = ""
+    @State var persions: Set<Person> = []
     
     var completionText: String
     
@@ -37,6 +39,7 @@ public struct EventEditor: View {
     }()
     
     public init(_ event: Event, completionText: String = "完了") {
+        self.primitive = event
         self._event = State(initialValue: event)
         self._location = State(initialValue: event.location ?? "")
         self._urlString = State(initialValue: event.url?.absoluteString ?? "")
@@ -129,13 +132,30 @@ public struct EventEditor: View {
                 } label: {
                     HStack {
                         Text("カレンダー")
+                        Spacer()
+                        if let calendar = model.calendars[event.calendarID] {
+                            ColorCircle(calendar.color.color)
+                        }
                     }
+                }
+                NavigationLink {
+                    PersonList(calendarID: event.calendarID, $persions)
+                        .environmentObject(model)
+                } label: {
+                    HStack {
+                        Text("スタッフ")
+                    }
+                }
+                .onChange(of: persions) { newValue in
+                    event.attendees = newValue.map({ person in
+                        Participant(name: person.name, thumbnailURL: person.thumbnailURL, role: .required, status: .isProcess, type: .person, url: person.url)
+                    })
                 }
                 NavigationLink {
                     EmptyView() // TODO: カレンダー
                 } label: {
                     HStack {
-                        Text("出席予定者")
+                        Text("管理ユニット")
                     }
                 }
             }
@@ -167,7 +187,7 @@ public struct EventEditor: View {
                 Button {
                     Task {
                         do {
-                            try await model.update(event: event)
+                            try await model.update(before: primitive, after: event)
                             dismiss()
                         } catch {
                             print(error)

@@ -16,11 +16,13 @@ public class CalendarModel: ObservableObject {
 
     public var timeZone: TimeZone = .autoupdatingCurrent
 
-    public var options: TrackEditorOptions = TrackEditorOptions(interval: .minute(30), headerWidth: 120, trackHeight: 70, barWidth: 80)
+    public var options: TrackEditorOptions = TrackEditorOptions(interval: .minute(30), headerWidth: 230, trackHeight: 96, barWidth: 80)
 
-    @Published public var calendars: [Calendar]
+    @Published public var calendars: [Calendar] = []
 
-    @Published public var events: [Event] {
+    @Published public var data: [String: [Event]] = [:]
+
+    public var events: [Event] {
         didSet {
             self.data = Dictionary(grouping: events, by: { $0.calendarID })
         }
@@ -28,17 +30,23 @@ public class CalendarModel: ObservableObject {
 
     public var defaultCalendar: Calendar?
 
-    public var data: [String: [Event]] = [:]
-
     public var calendarStore: CalendarStore?
 
     public var eventStore: EventStore?
 
-    public init(calendars: [Calendar] = [], events: [Event] = [], calendarStore: CalendarStore? = nil, eventStore: EventStore? = nil) {
+    public var personStore: PersonStore?
+
+
+    public init(calendars: [Calendar] = [], events: [Event] = []) {
         self.calendars = calendars
         self.events = events
+    }
+
+    public convenience init(calendarStore: CalendarStore? = nil, eventStore: EventStore? = nil, personStore: PersonStore? = nil) {
+        self.init(calendars: [], events: [])
         self.calendarStore = calendarStore
         self.eventStore = eventStore
+        self.personStore = personStore
     }
 
     var dateComponentsFormatter: DateComponentsFormatter = {
@@ -81,7 +89,7 @@ public class CalendarModel: ObservableObject {
 
     // Calendar: -
 
-    public func fetchCalendars<Response>() -> AsyncThrowingStream<([Calendar], Response), Error>? {
+    public func fetchCalendars() -> AsyncThrowingStream<[Calendar], Error>? {
         calendarStore?.fetchCalendars()
     }
 
@@ -105,11 +113,11 @@ public class CalendarModel: ObservableObject {
 
     // Event: -
 
-    public func fetchEvents<Response>() -> AsyncThrowingStream<([Event], Response), Error>? {
+    public func fetchEvents() -> AsyncThrowingStream<[Event], Error>? {
         eventStore?.fetchEvents()
     }
 
-    public func fetchEvents<Response>(calendarID: Calendar.ID) -> AsyncThrowingStream<((added: [Event], modified: [Event], removed: [Event]), Response), Error>? {
+    public func fetchEvents(calendarID: Calendar.ID) -> AsyncThrowingStream<(added: [Event], modified: [Event], removed: [Event]), Error>? {
         eventStore?.fetchEvents(calendarID: calendarID)
     }
 
@@ -117,14 +125,20 @@ public class CalendarModel: ObservableObject {
         eventStore?.placeholder(calendarID: calendarID)
     }
 
-    public func update(event: Event) async throws {
-        try await eventStore?.update(event: event)
-        if events.contains(where: { $0.calendarID == event.calendarID && $0.id == event.id }) {
-            Task.detached { @MainActor in
-                self.events[event.calendarID, event.id] = event
-            }
-        } else {
-            events.append(event)
+    public func create(event: Event) async throws {
+        try await eventStore?.create(event: event)
+        Task.detached { @MainActor in
+            self.events[event.calendarID, event.id] = event
+        }
+    }
+
+    public func update(before: Event, after: Event) async throws {
+        try await eventStore?.update(before: before, after: after)
+        Task.detached { @MainActor in
+            self.events[after.calendarID, after.id] = after
+        }
+        Task.detached { @MainActor in
+            self.events[before.calendarID, before.id] = nil
         }
     }
 
@@ -133,5 +147,15 @@ public class CalendarModel: ObservableObject {
         Task.detached { @MainActor in
             self.events[event.calendarID, event.id] = nil
         }
+    }
+
+    // Person: -
+
+    public func create(person: Person) async throws {
+        try await personStore?.create(person: person)
+    }
+
+    public func fetchPersons(calendarID: Calendar.ID) -> AsyncThrowingStream<[Person], Error>? {
+        personStore?.fetchPersons(calendarID: calendarID)
     }
 }

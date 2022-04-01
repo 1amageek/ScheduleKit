@@ -99,9 +99,12 @@ extension Array where Element == Event {
             self.first(where: { $0.calendarID == calendarID && $0.id == eventID })
         }
         set {
-            if let newValue = newValue,
-               let index = self.firstIndex(where:{ $0.calendarID == calendarID && $0.id == eventID }) {
-                self[index] = newValue
+            if let newValue = newValue {
+                if let index = self.firstIndex(where:{ $0.calendarID == calendarID && $0.id == eventID }) {
+                    self[index] = newValue
+                } else {
+                    self.append(newValue)
+                }
             } else if let index = self.firstIndex(where:{ $0.calendarID == calendarID && $0.id == eventID }) {
                 self.remove(at: index)
             }

@@ -81,12 +81,58 @@ public struct TimelineCalendar<Content: View>: View {
     }
 }
 
-public struct PlaceholderViewState {
-    public var size: CGSize = .zero
-    public var offset: CGSize = .zero
+public struct Region: View {
+
+    @EnvironmentObject var model: CalendarModel
+
+    @Binding var selection: Event?
+
+    var event: Event
+
+    var color: RGB
+
+    public init(event: Event, selection: Binding<Event?>, color: RGB) {
+        self.event = event
+        self.color = color
+        self._selection = selection
+    }
+
+    public var body: some View {
+        GeometryReader { proxy in
+            VStack(alignment: .leading, spacing: 4) {
+                Text(event.title)
+                    .font(.title3)
+                    .bold()
+                    .foregroundColor(color.color)
+                    .brightness(-0.4)
+                Text(model.dateFormatter.string(from: event.startDate))
+                    .foregroundColor(color.color)
+                    .brightness(-0.2)
+            }
+            .padding(EdgeInsets(top: 6, leading: 8, bottom: 6, trailing: 8))
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+            .background(color.color.saturation(0.35).brightness(0.35))
+            .cornerRadius(8)
+            .padding(EdgeInsets(top: 2, leading: 2, bottom: 2, trailing: 2))
+            .onTapGesture {
+                self.selection = event
+            }
+            .anchorPreference(key: RegionPreferenceKey.self, value: .bounds, transform: { [RegionPreference(event: event, bounds: $0)] })
+        }
+        .toolbar {
+            ToolbarItem(placement: .navigation) {
+//                Text(model.)
+            }
+        }
+    }
 }
 
 public struct TimelineLane: View {
+
+    enum Participant: String {
+        case person
+        case resource
+    }
 
     @EnvironmentObject var model: CalendarModel
 
@@ -97,6 +143,8 @@ public struct TimelineLane: View {
     var calendarID: String
 
     var color: RGB
+
+    @State var participant: Participant = .resource
 
     @State var draft: Event?
 
@@ -111,45 +159,80 @@ public struct TimelineLane: View {
 
     public var body: some View {
         TrackLane(data) { event in
-            GeometryReader { proxy in
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(event.title)
-                        .font(.title3)
-                        .bold()
-                        .foregroundColor(color.color)
-                        .brightness(-0.4)
-                    Text(model.dateFormatter.string(from: event.startDate))
-                        .foregroundColor(color.color)
-                        .brightness(-0.2)
-                }
-                .padding(EdgeInsets(top: 6, leading: 8, bottom: 6, trailing: 8))
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-                .background(color.color.saturation(0.35).brightness(0.35))
-                .cornerRadius(8)
-                .padding(EdgeInsets(top: 2, leading: 2, bottom: 2, trailing: 2))
-                .onTapGesture {
-                    self.selection = event
-                }
-                .anchorPreference(key: RegionPreferenceKey.self, value: .bounds, transform: { [RegionPreference(event: event, bounds: $0)] })
-            }
+            Region(event: event, selection: $selection, color: color)
         } header: { _ in
             VStack(alignment: .leading) {
-                if let calendar = model.calendars.first(where: { $0.id == calendarID }) {
-                    Text(calendar.title)
-                        .font(.title2)
-                        .padding(6)
+                VStack(alignment: .leading, spacing: 8) {
+                    if let calendar = model.calendars.first(where: { $0.id == calendarID }) {
+                        Text(calendar.title)
+                            .font(.title2)
+                    }
+
+                    Picker(selection: $participant) {
+                        Text("スタッフ").tag(Participant.person)
+                        Text("ユニット").tag(Participant.resource)
+                    } label: {
+                        EmptyView()
+                    }
+                    .pickerStyle(.segmented)
                 }
+                .padding(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
                 Spacer()
                 Divider()
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-            .background(.white)
+
+#if os(iOS)
+            .background(Color(.systemGroupedBackground))
+#else
+            .background(Color(NSColor.underPageBackgroundColor))
+#endif
         } background: { index in
             HStack {
                 Spacer()
                 Divider()
             }
         }
+//    subTrackLane: {
+//            ForEach(calendars, id: \.id) { calendar in
+//                TrackLane(data) { event in
+//                    Region(event: event, selection: $selection, color: color)
+//                } header: { _ in
+//                    VStack(alignment: .leading) {
+//                        VStack(alignment: .leading, spacing: 8) {
+//                            if let calendar = model.calendars.first(where: { $0.id == calendarID }) {
+//                                Text(calendar.title)
+//                                    .font(.title2)
+//                            }
+//
+//                            Picker(selection: $participant) {
+//                                Text("スタッフ").tag(Participant.person)
+//                                Text("ユニット").tag(Participant.resource)
+//                            } label: {
+//                                EmptyView()
+//                            }
+//                            .pickerStyle(.segmented)
+//                        }
+//                        .padding(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+//                        Spacer()
+//                        Divider()
+//                    }
+//                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+//
+//        #if os(iOS)
+//                    .background(Color(.systemGroupedBackground))
+//        #else
+//                    .background(Color(NSColor.underPageBackgroundColor))
+//        #endif
+//                } background: { index in
+//                    HStack {
+//                        Spacer()
+//                        Divider()
+//                    }
+//                }
+//            }
+//        }
+        .id(calendarID)
     }
 }
 

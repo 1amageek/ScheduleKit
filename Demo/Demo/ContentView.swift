@@ -11,7 +11,7 @@ import FirebaseFirestore
 
 struct ContentView: View {
 
-    @StateObject var model: CalendarModel = CalendarModel(calendarStore: CalendarStore(), eventStore: EventStore())
+    @StateObject var model: CalendarModel = CalendarModel(calendarStore: CalendarStore(), eventStore: EventStore(), personStore: PersonStore())
 
     @State var event: Event?
 
@@ -22,7 +22,7 @@ struct ContentView: View {
                 TimelineLane(model.data[calendar.id] ?? [], selection: selection, calendarID: calendar.id, color: calendar.color)
                     .task {
                         do {
-                            for try await ((added, modified, removed), _): ((added: [Event], modified: [Event], removed: [Event]), QuerySnapshot) in model.fetchEvents(calendarID: calendar.id)! {
+                            for try await (added, modified, removed): (added: [Event], modified: [Event], removed: [Event]) in model.fetchEvents(calendarID: calendar.id)! {
                                 print(added, modified, removed)
                                 let current = self.model.events
                                 if !added.isEmpty {
@@ -71,7 +71,7 @@ struct ContentView: View {
             }
             .task {
                 do {
-                    for try await (calendars, _): ([ScheduleKit.Calendar], QuerySnapshot) in model.fetchCalendars()! {
+                    for try await calendars in model.fetchCalendars()! {
                         self.model.calendars = calendars
                     }
                 } catch {

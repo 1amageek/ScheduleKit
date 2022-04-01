@@ -14,12 +14,12 @@ import DocumentID
 final class EventStore: ObservableObject, ScheduleKit.EventStore {
 
 
-    func fetchEvents<Response>() -> AsyncThrowingStream<([Event], Response), Error>? {
+    func fetchEvents() -> AsyncThrowingStream<[Event], Error>? {
         return nil
     }
 
-    func fetchEvents<FIRQuerySnapshot>(calendarID: ScheduleKit.Calendar.ID) -> AsyncThrowingStream<((added: [Event], modified: [Event], removed: [Event]), FIRQuerySnapshot), Error>? {
-        return Firestore.firestore().collection("calendars").document(calendarID).collection("events").changes(type: Event.self) as! AsyncThrowingStream<((added: [Event], modified: [Event], removed: [Event]), FIRQuerySnapshot), Error>?
+    func fetchEvents(calendarID: ScheduleKit.Calendar.ID) -> AsyncThrowingStream<(added: [Event], modified: [Event], removed: [Event]), Error>? {
+        return Firestore.firestore().collection("calendars").document(calendarID).collection("events").changes(type: Event.self)
     }
 
     func placeholder(calendarID: String) -> Event? {
@@ -36,8 +36,15 @@ final class EventStore: ObservableObject, ScheduleKit.EventStore {
         return event
     }
 
-    func update(event: Event) async throws {
-        try Firestore.firestore().collection("calendars").document(event.calendarID).collection("events").document(event.id).setData(from: event, merge: true)
+    func create(event: Event) async throws {
+        try Firestore.firestore().collection("calendars").document(event.calendarID).collection("events").document(event.id).setData(from: event)
+    }
+
+    func update(before: Event, after: Event) async throws {
+        let batch = Firestore.firestore().batch()
+        batch.deleteDocument(Firestore.firestore().collection("calendars").document(before.calendarID).collection("events").document(before.id))
+        try batch.setData(from: after, forDocument: Firestore.firestore().collection("calendars").document(after.calendarID).collection("events").document(after.id), merge: true)
+        try await batch.commit()
     }
 
     func delete(event: Event) async throws {

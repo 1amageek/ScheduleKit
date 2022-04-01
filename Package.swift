@@ -16,7 +16,7 @@ let package = Package(
         .package(url: "git@github.com:1amageek/DocumentID.git", branch: "main"),
         .package(url: "git@github.com:1amageek/RecurrenceRule.git", branch: "main"),
         .package(url: "git@github.com:1amageek/CalendarUI.git", from: "1.0.1"),
-        .package(url: "git@github.com:1amageek/TrackEditor.git", from: "0.4.1")
+        .package(url: "git@github.com:1amageek/TrackEditor.git", from: "0.4.2")
     ],
     targets: [
         .target(

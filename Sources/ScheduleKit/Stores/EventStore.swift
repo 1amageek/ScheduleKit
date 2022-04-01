@@ -9,11 +9,12 @@ import Foundation
 
 public protocol EventStore {
 
-    func fetchEvents<Response>() -> AsyncThrowingStream<([Event], Response), Error>?
-    func fetchEvents<Response>(calendarID: Calendar.ID) -> AsyncThrowingStream<((added: [Event], modified: [Event], removed: [Event]), Response), Error>?
+    func fetchEvents() -> AsyncThrowingStream<[Event], Error>?
+    func fetchEvents(calendarID: Calendar.ID) -> AsyncThrowingStream<(added: [Event], modified: [Event], removed: [Event]), Error>?
 
     func placeholder(calendarID: String) -> Event?
 
-    func update(event: Event) async throws
+    func create(event: Event) async throws
+    func update(before: Event, after: Event) async throws
     func delete(event: Event) async throws
 }

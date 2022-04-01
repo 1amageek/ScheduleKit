@@ -42,7 +42,7 @@
       "location" : "git@github.com:firebase/firebase-ios-sdk.git",
       "state" : {
         "branch" : "master",
-        "revision" : "90b117f6f9f40ef5b627ffa3769105c01456cbce"
+        "revision" : "031cd482848820aa4d4f37f0769450909281d04b"
       }
     },
     {
@@ -51,7 +51,7 @@
       "location" : "git@github.com:1amageek/FirestoreSwift.git",
       "state" : {
         "branch" : "main",
-        "revision" : "484af9589e9d8a817ca86cadd5dd0d575aea3e7a"
+        "revision" : "5666f131491f2c3192b838226442d3e977a2308d"
       }
     },
     {
@@ -158,8 +158,8 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:1amageek/TrackEditor.git",
       "state" : {
-        "revision" : "72ec34cf89efd24fe9ba7801e428cd5f32ed2fc4",
-        "version" : "0.4.1"
+        "revision" : "a373e4387b7811fb8b745bbaac00a72c9deeb92b",
+        "version" : "0.4.2"
       }
     }
   ],
