@@ -13,6 +13,12 @@ extension Event: LaneRegioning {
     public func startRegion(_ interval: Interval) -> Int {
         let components = Foundation.Calendar(identifier: .iso8601).dateComponents([.calendar, .timeZone, .year, .month, .day, .hour, .minute, .second], from: startDate)
         switch interval {
+            case .month(let int):
+                let (index, _) = components.month!.quotientAndRemainder(dividingBy: int)
+                return index
+            case .day(let int):
+                let (index, _) = components.day!.quotientAndRemainder(dividingBy: int)
+                return index
             case .hour(let int):
                 let (index, _) = components.hour!.quotientAndRemainder(dividingBy: int)
                 return index
@@ -30,6 +36,12 @@ extension Event: LaneRegioning {
     public func endRegion(_ interval: Interval) -> Int {
         let components = Foundation.Calendar(identifier: .iso8601).dateComponents([.calendar, .timeZone, .year, .month, .day, .hour, .minute, .second], from: endDate)
         switch interval {
+            case .month(let int):
+                let (index, _) = components.month!.quotientAndRemainder(dividingBy: int)
+                return index
+            case .day(let int):
+                let (index, _) = components.day!.quotientAndRemainder(dividingBy: int)
+                return index
             case .hour(let int):
                 let (index, _) = components.hour!.quotientAndRemainder(dividingBy: int)
                 return index

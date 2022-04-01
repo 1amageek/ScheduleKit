@@ -142,6 +142,12 @@ public class CalendarModel: ObservableObject {
 
     public func dateComponents(_ index: Int) -> DateComponents {
         switch options.interval {
+            case .month(let int):
+                let month = int * index
+                return DateComponents(calendar: calendar, timeZone: timeZone, month: month)
+            case .day(let int):
+                let day = int * index
+                return DateComponents(calendar: calendar, timeZone: timeZone, day: day)
             case .hour(let int):
                 let hour = int * index
                 return DateComponents(calendar: calendar, timeZone: timeZone, hour: hour)
@@ -188,7 +194,7 @@ public class CalendarModel: ObservableObject {
     private func changeInterval() {
         switch displayMode {
             case .month(_, _):
-                self.options = TrackEditorOptions(interval: .hour(2), headerWidth: 230, trackHeight: 96, barWidth: 80)
+                self.options = TrackEditorOptions(interval: .day(1), headerWidth: 230, trackHeight: 96, barWidth: 80)
             case .day(_, _, _):
                 self.options = TrackEditorOptions(interval: .minute(30), headerWidth: 230, trackHeight: 96, barWidth: 80)
         }

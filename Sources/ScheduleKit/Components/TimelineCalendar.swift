@@ -22,6 +22,13 @@ public struct TimelineCalendar<Content: View>: View {
 
     var range: Range<Int> {
         switch model.options.interval {
+            case .month(let int):
+                let interval = max(1, min(11, int))
+                return 0..<(12 / interval)
+            case .day(let int):
+                let range = model.calendar.range(of: .day, in: .month, for: model.dateComponents.date!)!
+                let interval = max(1, min(range.upperBound - 1, int))
+                return 0..<(range.upperBound / interval)
             case .hour(let int):
                 let interval = max(1, min(23, int))
                 return 0..<(24 / interval)
