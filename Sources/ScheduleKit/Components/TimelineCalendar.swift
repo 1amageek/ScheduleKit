@@ -89,7 +89,9 @@ public struct TimelineCalendar<Content: View>: View {
                 } ruler: { index in
                     HStack {
                         Text(model.label(index))
-                            .padding(.horizontal, 12)
+                            .font(.footnote)
+                            .foregroundColor(.secondary)
+                            .padding(.horizontal, 8)
                         Spacer()
                         Divider()
                     }
@@ -189,11 +191,44 @@ public struct TimelineLane: View {
 
     @State var regionRreferences: [RegionPreference] = []
 
+    @State var task: Task<(), Never>?
+
     public init(_ data: Array<Event>, selection: Binding<Event?>, calendarID: String, color: RGB) {
         self.data = data
         self._selection = selection
         self.calendarID = calendarID
         self.color = color
+    }
+
+    func reloadData(calendarID: String, range: Range<Date>) {
+        self.task?.cancel()
+        let task = Task {
+            do {
+                for try await (added, modified, removed): (added: [Event], modified: [Event], removed: [Event]) in model.fetchEvents(calendarID: calendarID, range: model.range)! {
+                    print(added, modified, removed)
+                    let current = self.model.events
+                    if !added.isEmpty {
+                        let events = added.filter { event in
+                            !current.contains(where: { $0.id == event.id && $0.calendarID == event.calendarID })
+                        }
+                        self.model.events += events
+                    }
+                    if !modified.isEmpty {
+                        modified.forEach { event in
+                            self.model.events[event.calendarID, event.id] = event
+                        }
+                    }
+                    if !removed.isEmpty {
+                        self.model.events = removed.filter { event in
+                            current.contains(where: { $0.id == event.id && $0.calendarID == event.calendarID })
+                        }
+                    }
+                }
+            } catch {
+                print(error)
+            }
+        }
+        self.task = task
     }
 
     public var body: some View {
@@ -232,6 +267,12 @@ public struct TimelineLane: View {
                 Divider()
             }
         }
+        .task {
+            reloadData(calendarID: calendarID, range: model.range)
+        }
+        .onChange(of: model.displayMode, perform: { newValue in
+            reloadData(calendarID: calendarID, range: model.range)
+        })
 //    subTrackLane: {
 //            ForEach(calendars, id: \.id) { calendar in
 //                TrackLane(data) { event in
@@ -328,7 +369,7 @@ struct TimelineCalendar_Previews: PreviewProvider {
                   isAllDay: false,
                   startDate: startDate,
                   endDate: endDate),
-        ])
+        ], displayMode: .day(year: 2022, month: 4, day: 1))
 
         @State var isPresented: Bool = false
 

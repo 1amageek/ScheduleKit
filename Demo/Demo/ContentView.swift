@@ -15,6 +15,10 @@ struct ContentView: View {
 
     @State var event: Event?
 
+    func reloadData(calendarID: String, range: Range<Date>) {
+
+    }
+
     var body: some View {
         NavigationView {
             Sidebar()
@@ -22,7 +26,7 @@ struct ContentView: View {
                 TimelineLane(model.data[calendar.id] ?? [], selection: selection, calendarID: calendar.id, color: calendar.color)
                     .task {
                         do {
-                            for try await (added, modified, removed): (added: [Event], modified: [Event], removed: [Event]) in model.fetchEvents(calendarID: calendar.id)! {
+                            for try await (added, modified, removed): (added: [Event], modified: [Event], removed: [Event]) in model.fetchEvents(calendarID: calendar.id, range: model.range)! {
                                 print(added, modified, removed)
                                 let current = self.model.events
                                 if !added.isEmpty {

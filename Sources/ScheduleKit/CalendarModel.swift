@@ -39,6 +39,12 @@ public enum CalendarDisplayMode: Hashable {
                 return day
         }
     }
+
+    public static var `default`:  CalendarDisplayMode {
+        let dateComponents = Foundation.Calendar(identifier: .iso8601).dateComponents([.calendar, .timeZone, .year, .month, .day], from: Date())
+        let displayMode: CalendarDisplayMode = .day(year: dateComponents.year!, month: dateComponents.month!, day: dateComponents.day!)
+        return displayMode
+    }
 }
 
 public class CalendarModel: ObservableObject {
@@ -54,7 +60,7 @@ public class CalendarModel: ObservableObject {
         }
     }
 
-    @Published public var options: TrackEditorOptions = TrackEditorOptions(interval: .minute(30), headerWidth: 230, trackHeight: 96, barWidth: 80)
+    @Published public var options: TrackEditorOptions
 
     @Published public var calendars: [Calendar] = []
 
@@ -81,7 +87,7 @@ public class CalendarModel: ObservableObject {
         }
     }
 
-    private var range: Range<Date> {
+    public var range: Range<Date> {
         switch displayMode {
             case .month(_, _):
                 let startDate = dateComponents.date!
@@ -94,15 +100,28 @@ public class CalendarModel: ObservableObject {
         }
     }
 
-    public init(calendars: [Calendar] = [], events: [Event] = []) {
+    static func options(displayMode: CalendarDisplayMode, calendar: Foundation.Calendar, timeZone: TimeZone) -> TrackEditorOptions {
+        switch displayMode {
+            case .month(let year, let month):
+                let dateComponents = DateComponents(calendar: calendar, timeZone: timeZone, year: year, month: month)
+                return TrackEditorOptions(interval: .day(1), reference: dateComponents, headerWidth: 230, trackHeight: 96, barWidth: 80)
+            case .day(let year, let month, let day):
+                let dateComponents = DateComponents(calendar: calendar, timeZone: timeZone, year: year, month: month, day: day)
+                return TrackEditorOptions(interval: .minute(30), reference: dateComponents, headerWidth: 230, trackHeight: 96, barWidth: 80)
+        }
+    }
+
+    public init(calendars: [Calendar] = [], events: [Event] = [], displayMode: CalendarDisplayMode = CalendarDisplayMode.default) {
         let dateComponents = Foundation.Calendar(identifier: .iso8601).dateComponents([.calendar, .timeZone, .year, .month, .day], from: Date())
-        self._displayMode = Published(initialValue: .month(year: dateComponents.year!, month: dateComponents.month!))
+        let displayMode: CalendarDisplayMode = .day(year: dateComponents.year!, month: dateComponents.month!, day: dateComponents.day!)
+        self._displayMode = Published(initialValue: displayMode)
+        self.options = Self.options(displayMode: displayMode, calendar: self.calendar, timeZone: self.timeZone)
         self.calendars = calendars
         self.events = events
     }
 
-    public convenience init(calendarStore: CalendarStore? = nil, eventStore: EventStore? = nil, personStore: PersonStore? = nil) {
-        self.init(calendars: [], events: [])
+    public convenience init(displayMode: CalendarDisplayMode = CalendarDisplayMode.default, calendarStore: CalendarStore? = nil, eventStore: EventStore? = nil, personStore: PersonStore? = nil) {
+        self.init(calendars: [], events: [], displayMode: displayMode)
         self.calendarStore = calendarStore
         self.eventStore = eventStore
         self.personStore = personStore
@@ -133,12 +152,25 @@ public class CalendarModel: ObservableObject {
         return formatter
     }()
 
-    var dateFormatter: DateFormatter = {
+    var dateFormatter: DateFormatter {
         let formatter: DateFormatter = DateFormatter()
-        formatter.dateStyle = .none
-        formatter.timeStyle = .short
+        switch options.interval {
+            case .month(_):
+                formatter.dateFormat = DateFormatter.dateFormat(fromTemplate: "d", options: 0, locale: .autoupdatingCurrent)
+            case .day(_):
+                formatter.dateFormat = DateFormatter.dateFormat(fromTemplate: "d", options: 0, locale: .autoupdatingCurrent)
+            case .hour(_):
+                formatter.dateStyle = .none
+                formatter.timeStyle = .short
+            case .minute(_):
+                formatter.dateStyle = .none
+                formatter.timeStyle = .short
+            case .second(_):
+                formatter.dateStyle = .none
+                formatter.timeStyle = .short
+        }
         return formatter
-    }()
+    }
 
     public func dateComponents(_ index: Int) -> DateComponents {
         switch options.interval {
@@ -165,7 +197,10 @@ public class CalendarModel: ObservableObject {
 
     public func label(_ index: Int) -> String {
         let dateComponents = dateComponents(index)
-        return dateComponentsFormatter.string(from: dateComponents)!
+        switch options.interval {
+            case .month(_), .day(_): return dateFormatter.string(from: dateComponents.date!)
+            default: return dateComponentsFormatter.string(from: dateComponents)!
+        }
     }
 
     public func prev() {
@@ -187,17 +222,15 @@ public class CalendarModel: ObservableObject {
     }
 
     private func reloadData() {
+        Task {
+            
+        }
         let filtered = events.filter({ range.lowerBound <= $0.startDate && $0.startDate < range.upperBound || range.lowerBound <= $0.endDate && $0.endDate < range.upperBound  })
         self.data = Dictionary(grouping: filtered, by: { $0.calendarID })
     }
 
     private func changeInterval() {
-        switch displayMode {
-            case .month(_, _):
-                self.options = TrackEditorOptions(interval: .day(1), headerWidth: 230, trackHeight: 96, barWidth: 80)
-            case .day(_, _, _):
-                self.options = TrackEditorOptions(interval: .minute(30), headerWidth: 230, trackHeight: 96, barWidth: 80)
-        }
+        self.options = Self.options(displayMode: displayMode, calendar: calendar, timeZone: timeZone)
     }
 
     // Calendar: -
@@ -230,8 +263,8 @@ public class CalendarModel: ObservableObject {
         eventStore?.fetchEvents()
     }
 
-    public func fetchEvents(calendarID: Calendar.ID) -> AsyncThrowingStream<(added: [Event], modified: [Event], removed: [Event]), Error>? {
-        eventStore?.fetchEvents(calendarID: calendarID)
+    public func fetchEvents(calendarID: Calendar.ID, range: Range<Date>) -> AsyncThrowingStream<(added: [Event], modified: [Event], removed: [Event]), Error>? {
+        eventStore?.fetchEvents(calendarID: calendarID, range: range)
     }
 
     func placeholder(calendarID: String) -> Event? {
@@ -248,12 +281,10 @@ public class CalendarModel: ObservableObject {
     public func update(before: Event, after: Event) async throws {
         try await eventStore?.update(before: before, after: after)
         Task.detached { @MainActor in
-            self.events[after.calendarID, after.id] = after
+            self.events[before.calendarID, before.id] = nil
         }
-        if before.calendarID != after.calendarID {
-            Task.detached { @MainActor in
-                self.events[before.calendarID, before.id] = nil
-            }
+        Task.detached { @MainActor in
+            self.events[after.calendarID, after.id] = after
         }
     }
 

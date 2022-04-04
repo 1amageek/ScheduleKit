@@ -42,7 +42,7 @@
       "location" : "git@github.com:firebase/firebase-ios-sdk.git",
       "state" : {
         "branch" : "master",
-        "revision" : "031cd482848820aa4d4f37f0769450909281d04b"
+        "revision" : "f7261aef6e0e058c535890ac57fbc75c23ef62f3"
       }
     },
     {
@@ -158,8 +158,8 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:1amageek/TrackEditor.git",
       "state" : {
-        "revision" : "a373e4387b7811fb8b745bbaac00a72c9deeb92b",
-        "version" : "0.4.2"
+        "revision" : "71c6ca4431c6e2b3cad058a627cfa55e4167d03b",
+        "version" : "0.5.2"
       }
     }
   ],
