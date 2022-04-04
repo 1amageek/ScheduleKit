@@ -56,12 +56,15 @@ public struct Calendar: Identifiable, Codable, Hashable {
 
     public var supportedEventAvailabilities: CalendarEventAvailabilityMask
 
-    public init(id: String, title: String, type: CalendarType = .local, color: RGB = .green, supportedEventAvailabilities: CalendarEventAvailabilityMask = .all) {
+    public var metadata: [String: String]
+
+    public init(id: String, title: String, type: CalendarType = .local, color: RGB = .green, supportedEventAvailabilities: CalendarEventAvailabilityMask = .all, metadata: [String: String] = [:]) {
         self.id = id
         self.title = title
         self.type = type
         self.color = color
         self.supportedEventAvailabilities = supportedEventAvailabilities
+        self.metadata = metadata
     }
 }
 

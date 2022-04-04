@@ -55,6 +55,7 @@ public struct Participant: Codable, Hashable {
     public var status: ParticipantStatus
     public var type: ParticipantType
     public var url: URL
+    public var metadata: [String: String]
 
     public init(
         name: String,
@@ -62,7 +63,8 @@ public struct Participant: Codable, Hashable {
         role: ParticipantRole = .unknown,
         status: ParticipantStatus = .unknown,
         type: ParticipantType = .unknown,
-        url: URL
+        url: URL,
+        metadata: [String: String] = [:]
     ) {
         self.name = name
         self.thumbnailURL = thumbnailURL
@@ -70,5 +72,6 @@ public struct Participant: Codable, Hashable {
         self.status = status
         self.type = type
         self.url = url
+        self.metadata = metadata
     }
 }

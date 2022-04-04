@@ -18,23 +18,22 @@ final class EventStore: ObservableObject, ScheduleKit.EventStore {
         return nil
     }
 
-    func fetchEvents(calendarID: ScheduleKit.Calendar.ID, range: Range<Date>) -> AsyncThrowingStream<(added: [Event], modified: [Event], removed: [Event]), Error>? {
+    func fetchEvents(calendar: ScheduleKit.Calendar, range: Range<Date>) -> AsyncThrowingStream<(added: [Event], modified: [Event], removed: [Event]), Error>? {
         return Firestore.firestore()
             .collection("calendars")
-            .document(calendarID)
+            .document(calendar.id)
             .collection("events")
             .whereField("startDate", isGreaterThanOrEqualTo: range.lowerBound)
             .whereField("startDate", isLessThan: range.upperBound)
             .changes(type: Event.self)
     }
 
-    func placeholder(calendarID: String) -> Event? {
-        let calendar = Foundation.Calendar.init(identifier: .iso8601)
+    func placeholder(calendar: ScheduleKit.Calendar) -> Event? {
         let id = AutoID.generate(length: 4)
         let startDate: Date = Date()
-        let endDate: Date = calendar.date(byAdding: .hour, value: 1, to: startDate)!
+        let endDate: Date = Foundation.Calendar.init(identifier: .iso8601).date(byAdding: .hour, value: 1, to: startDate)!
         let event = Event(id: id,
-                          calendarID: calendarID,
+                          calendarID: calendar.id,
                           title: "TITLE",
                           occurrenceDate: startDate,
                           isAllDay: false,

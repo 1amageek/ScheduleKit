@@ -104,10 +104,10 @@ public class CalendarModel: ObservableObject {
         switch displayMode {
             case .month(let year, let month):
                 let dateComponents = DateComponents(calendar: calendar, timeZone: timeZone, year: year, month: month)
-                return TrackEditorOptions(interval: .day(1), reference: dateComponents, headerWidth: 230, trackHeight: 96, barWidth: 80)
+                return TrackEditorOptions(interval: .day(1), reference: dateComponents, headerWidth: 230, trackHeight: 90, barWidth: 80)
             case .day(let year, let month, let day):
                 let dateComponents = DateComponents(calendar: calendar, timeZone: timeZone, year: year, month: month, day: day)
-                return TrackEditorOptions(interval: .minute(30), reference: dateComponents, headerWidth: 230, trackHeight: 96, barWidth: 80)
+                return TrackEditorOptions(interval: .minute(30), reference: dateComponents, headerWidth: 230, trackHeight: 90, barWidth: 80)
         }
     }
 
@@ -263,12 +263,12 @@ public class CalendarModel: ObservableObject {
         eventStore?.fetchEvents()
     }
 
-    public func fetchEvents(calendarID: Calendar.ID, range: Range<Date>) -> AsyncThrowingStream<(added: [Event], modified: [Event], removed: [Event]), Error>? {
-        eventStore?.fetchEvents(calendarID: calendarID, range: range)
+    public func fetchEvents(calendar: Calendar, range: Range<Date>) -> AsyncThrowingStream<(added: [Event], modified: [Event], removed: [Event]), Error>? {
+        eventStore?.fetchEvents(calendar: calendar, range: range)
     }
 
-    func placeholder(calendarID: String) -> Event? {
-        eventStore?.placeholder(calendarID: calendarID)
+    func placeholder(calendar: Calendar) -> Event? {
+        eventStore?.placeholder(calendar: calendar)
     }
 
     public func create(event: Event) async throws {

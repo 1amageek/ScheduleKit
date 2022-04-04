@@ -93,7 +93,6 @@ public struct TimelineCalendar<Content: View>: View {
                             .foregroundColor(.secondary)
                             .padding(.horizontal, 8)
                         Spacer()
-                        Divider()
                     }
                     .frame(maxWidth: .infinity)
                     .tag(index)
@@ -181,7 +180,7 @@ public struct TimelineLane: View {
 
     var data: Array<Event>
 
-    var calendarID: String
+    var calendar: Calendar
 
     var color: RGB
 
@@ -193,42 +192,44 @@ public struct TimelineLane: View {
 
     @State var task: Task<(), Never>?
 
-    public init(_ data: Array<Event>, selection: Binding<Event?>, calendarID: String, color: RGB) {
+    public init(_ data: Array<Event>, selection: Binding<Event?>, calendar: Calendar, color: RGB) {
         self.data = data
         self._selection = selection
-        self.calendarID = calendarID
+        self.calendar = calendar
         self.color = color
     }
 
-    func reloadData(calendarID: String, range: Range<Date>) {
+    func reloadData(calendar: Calendar, range: Range<Date>) {
         self.task?.cancel()
-        let task = Task {
-            do {
-                for try await (added, modified, removed): (added: [Event], modified: [Event], removed: [Event]) in model.fetchEvents(calendarID: calendarID, range: model.range)! {
-                    print(added, modified, removed)
-                    let current = self.model.events
-                    if !added.isEmpty {
-                        let events = added.filter { event in
-                            !current.contains(where: { $0.id == event.id && $0.calendarID == event.calendarID })
+        if let updates = model.fetchEvents(calendar: calendar, range: model.range) {
+            let task = Task {
+                do {
+                    for try await (added, modified, removed): (added: [Event], modified: [Event], removed: [Event]) in updates {
+                        print(added, modified, removed)
+                        let current = self.model.events
+                        if !added.isEmpty {
+                            let events = added.filter { event in
+                                !current.contains(where: { $0.id == event.id && $0.calendarID == event.calendarID })
+                            }
+                            self.model.events += events
                         }
-                        self.model.events += events
-                    }
-                    if !modified.isEmpty {
-                        modified.forEach { event in
-                            self.model.events[event.calendarID, event.id] = event
+                        if !modified.isEmpty {
+                            modified.forEach { event in
+                                self.model.events[event.calendarID, event.id] = event
+                            }
+                        }
+                        if !removed.isEmpty {
+                            self.model.events = removed.filter { event in
+                                current.contains(where: { $0.id == event.id && $0.calendarID == event.calendarID })
+                            }
                         }
                     }
-                    if !removed.isEmpty {
-                        self.model.events = removed.filter { event in
-                            current.contains(where: { $0.id == event.id && $0.calendarID == event.calendarID })
-                        }
-                    }
+                } catch {
+                    print(error)
                 }
-            } catch {
-                print(error)
             }
+            self.task = task
         }
-        self.task = task
     }
 
     public var body: some View {
@@ -237,7 +238,7 @@ public struct TimelineLane: View {
         } header: { _ in
             VStack(alignment: .leading) {
                 VStack(alignment: .leading, spacing: 8) {
-                    if let calendar = model.calendars.first(where: { $0.id == calendarID }) {
+                    if let calendar = model.calendars.first(where: { $0.id == calendar.id }) {
                         Text(calendar.title)
                             .font(.title2)
                     }
@@ -261,58 +262,44 @@ public struct TimelineLane: View {
 #else
             .background(Color(NSColor.underPageBackgroundColor))
 #endif
-        } background: { index in
-            HStack {
-                Spacer()
-                Divider()
+        } subTrackLane: {
+            TrackLane(data) { event in
+                Region(event: event, selection: $selection, color: color)
+            } header: { _ in
+                VStack(alignment: .leading) {
+                    VStack(alignment: .leading, spacing: 8) {
+                        if let calendar = model.calendars.first(where: { $0.id == calendar.id }) {
+                            Text(calendar.title)
+                                .font(.title2)
+                        }
+
+                        Picker(selection: $participant) {
+                            Text("スタッフ").tag(Participant.person)
+                            Text("ユニット").tag(Participant.resource)
+                        } label: {
+                            EmptyView()
+                        }
+                        .pickerStyle(.segmented)
+                    }
+                    .padding(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                    Spacer()
+                    Divider()
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+#if os(iOS)
+                .background(Color(.systemGroupedBackground))
+#else
+                .background(Color(NSColor.underPageBackgroundColor))
+#endif
             }
         }
         .task {
-            reloadData(calendarID: calendarID, range: model.range)
+            reloadData(calendar: calendar, range: model.range)
         }
         .onChange(of: model.displayMode, perform: { newValue in
-            reloadData(calendarID: calendarID, range: model.range)
+            reloadData(calendar: calendar, range: model.range)
         })
-//    subTrackLane: {
-//            ForEach(calendars, id: \.id) { calendar in
-//                TrackLane(data) { event in
-//                    Region(event: event, selection: $selection, color: color)
-//                } header: { _ in
-//                    VStack(alignment: .leading) {
-//                        VStack(alignment: .leading, spacing: 8) {
-//                            if let calendar = model.calendars.first(where: { $0.id == calendarID }) {
-//                                Text(calendar.title)
-//                                    .font(.title2)
-//                            }
-//
-//                            Picker(selection: $participant) {
-//                                Text("スタッフ").tag(Participant.person)
-//                                Text("ユニット").tag(Participant.resource)
-//                            } label: {
-//                                EmptyView()
-//                            }
-//                            .pickerStyle(.segmented)
-//                        }
-//                        .padding(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
-//                        Spacer()
-//                        Divider()
-//                    }
-//                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-//
-//        #if os(iOS)
-//                    .background(Color(.systemGroupedBackground))
-//        #else
-//                    .background(Color(NSColor.underPageBackgroundColor))
-//        #endif
-//                } background: { index in
-//                    HStack {
-//                        Spacer()
-//                        Divider()
-//                    }
-//                }
-//            }
-//        }
-        .id(calendarID)
+        .id(calendar.id)
     }
 }
 
@@ -377,7 +364,7 @@ struct TimelineCalendar_Previews: PreviewProvider {
             NavigationView {
                 Spacer()
                 TimelineCalendar(model.calendars) { calendar, selection in
-                    TimelineLane(model.data[calendar.id] ?? [], selection: selection, calendarID: calendar.id, color: calendar.color)
+                    TimelineLane(model.data[calendar.id] ?? [], selection: selection, calendar: calendar, color: calendar.color)
                 }
                 .environmentObject(model)
                 .navigationBarTitleDisplayMode(.inline)

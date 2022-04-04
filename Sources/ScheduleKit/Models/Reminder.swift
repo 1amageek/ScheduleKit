@@ -35,7 +35,7 @@ public struct Reminder: CalendarItem {
     @ExplicitNull public var dueDateComponents: DateComponents?
     public var isCompleted: Bool
     @ExplicitNull public var completionDate: Date?
-
+    public var metadata: [String: String]
 
     public init(
         id: String,
@@ -53,7 +53,8 @@ public struct Reminder: CalendarItem {
         startDateComponents: DateComponents?,
         dueDateComponents: DateComponents?,
         isCompleted: Bool = false,
-        completionDate: Date? = nil
+        completionDate: Date? = nil,
+        metadata: [String: String] = [:]
     ) {
         self.id = id
         self.calendarID = calendarID
@@ -71,5 +72,6 @@ public struct Reminder: CalendarItem {
         self.dueDateComponents = dueDateComponents
         self.isCompleted = isCompleted
         self.completionDate = completionDate
+        self.metadata = metadata
     }
 }

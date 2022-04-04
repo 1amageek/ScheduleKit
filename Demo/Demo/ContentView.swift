@@ -15,41 +15,11 @@ struct ContentView: View {
 
     @State var event: Event?
 
-    func reloadData(calendarID: String, range: Range<Date>) {
-
-    }
-
     var body: some View {
         NavigationView {
             Sidebar()
             TimelineCalendar(model.calendars) { calendar, selection in
-                TimelineLane(model.data[calendar.id] ?? [], selection: selection, calendarID: calendar.id, color: calendar.color)
-                    .task {
-                        do {
-                            for try await (added, modified, removed): (added: [Event], modified: [Event], removed: [Event]) in model.fetchEvents(calendarID: calendar.id, range: model.range)! {
-                                print(added, modified, removed)
-                                let current = self.model.events
-                                if !added.isEmpty {
-                                    let events = added.filter { event in
-                                        !current.contains(where: { $0.id == event.id && $0.calendarID == event.calendarID })
-                                    }
-                                    self.model.events += events
-                                }
-                                if !modified.isEmpty {
-                                    modified.forEach { event in
-                                        self.model.events[event.calendarID, event.id] = event
-                                    }
-                                }
-                                if !removed.isEmpty {
-                                    self.model.events = removed.filter { event in
-                                        current.contains(where: { $0.id == event.id && $0.calendarID == event.calendarID })
-                                    }
-                                }
-                            }
-                        } catch {
-                            print(error)
-                        }
-                    }
+                TimelineLane(model.data[calendar.id] ?? [], selection: selection, calendar: calendar, color: calendar.color)
             }
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -59,7 +29,7 @@ struct ContentView: View {
                             return
                         }
                         self.model.defaultCalendar = calendar
-                        self.event = self.model.eventStore?.placeholder(calendarID: calendar.id)
+                        self.event = self.model.eventStore?.placeholder(calendar: calendar)
                     } label: {
                         Image(systemName: "plus")
                     }

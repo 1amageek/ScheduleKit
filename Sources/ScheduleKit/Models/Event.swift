@@ -48,6 +48,7 @@ public struct Event: CalendarItem {
     public var endDate: Date
     @ExplicitNull public var structuredLocation: StructuredLocation?
     @ExplicitNull public var organizer: Participant?
+    public var metadata: [String: String]
 
     public init(
         id: String,
@@ -68,7 +69,8 @@ public struct Event: CalendarItem {
         startDate: Date,
         endDate: Date,
         structuredLocation: StructuredLocation? = nil,
-        organizer: Participant? = nil
+        organizer: Participant? = nil,
+        metadata: [String: String] = [:]
     ) {
         self.id = id
         self.calendarID = calendarID
@@ -89,6 +91,7 @@ public struct Event: CalendarItem {
         self.endDate = endDate
         self.structuredLocation = structuredLocation
         self.organizer = organizer
+        self.metadata = metadata
     }
 }
 

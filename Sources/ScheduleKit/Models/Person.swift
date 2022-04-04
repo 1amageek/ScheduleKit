@@ -15,12 +15,14 @@ public struct Person: Identifiable, Codable, Hashable {
     public var name: String
     @ExplicitNull public var thumbnailURL: URL?
     public var url: URL
+    public var metadata: [String: String]
 
-    public init(id: String = AutoID.generate(length: 6), calendarID: String, name: String, thumbnailURL: URL? = nil, url: URL) {
+    public init(id: String = AutoID.generate(length: 6), calendarID: String, name: String, thumbnailURL: URL? = nil, url: URL, metadata: [String: String] = [:]) {
         self.id = id
         self.calendarID = calendarID
         self.name = name
         self.thumbnailURL = thumbnailURL
         self.url = url
+        self.metadata = metadata
     }
 }
