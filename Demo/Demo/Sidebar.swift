@@ -32,6 +32,7 @@ struct Sidebar: View {
                 }
             }
         }
+        .listStyle(.sidebar)
         .popover(item: $selection, content: { calendar in
             NavigationView {
                 CalendarEditor(calendar)

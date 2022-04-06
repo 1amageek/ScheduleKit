@@ -41,8 +41,8 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:1amageek/TrackEditor.git",
       "state" : {
-        "revision" : "b40efff50c93b18426307c6bf11a002cd89a80cc",
-        "version" : "0.5.6"
+        "revision" : "729fee9a66488d8d53ff105c93a47dc55d9d6a5a",
+        "version" : "0.5.7"
       }
     }
   ],
